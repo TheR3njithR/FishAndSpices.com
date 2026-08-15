@@ -2,7 +2,10 @@ import { keyedHash } from '../security.js';
 
 const policies = {
   lead_submission: { limit: 5, windowMs: 60_000 },
-  admin_login: { limit: 8, windowMs: 15 * 60_000 }
+  admin_login: { limit: 8, windowMs: 15 * 60_000 },
+  ai_chat_anon: { limit: 20, windowMs: 60_000 },
+  ai_chat_auth: { limit: 60, windowMs: 60_000 },
+  ai_realtime_session: { limit: 10, windowMs: 5 * 60_000 }
 };
 
 export async function consumeRateLimit(pool, scope, identifier, config, now = new Date()) {

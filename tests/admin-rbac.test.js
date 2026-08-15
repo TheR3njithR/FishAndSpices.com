@@ -8,6 +8,9 @@ const config = loadConfig({ NODE_ENV: 'test', APP_ORIGIN: 'http://localhost:3000
 const origin = 'http://localhost:3000';
 const leadId = '00000000-0000-4000-8000-0000000000aa';
 const matchId = '00000000-0000-4000-8000-0000000000bb';
+const contactRequestId = '00000000-0000-4000-8000-0000000000cc';
+const quoteId = '00000000-0000-4000-8000-0000000000dd';
+const reportId = '00000000-0000-4000-8000-0000000000ee';
 const csrfToken = 'csrf-token';
 
 function session(role) {
@@ -28,7 +31,11 @@ const mutations = [
   ['post', `/api/v1/admin/leads/${leadId}/verification`, {}],
   ['post', '/api/v1/admin/matches', { buyerLeadId: leadId, sellerLeadId: matchId, score: 80, explanation: 'Aligned' }],
   ['patch', `/api/v1/admin/matches/${matchId}`, { status: 'Reviewing' }],
-  ['patch', `/api/v1/admin/location-risk-events/${matchId}`, { status: 'dismissed', notes: 'Reviewed' }]
+  ['patch', `/api/v1/admin/location-risk-events/${matchId}`, { status: 'dismissed', notes: 'Reviewed' }],
+  ['patch', `/api/v1/admin/marketplace/leads/${leadId}`, { marketplaceStatus: 'ACTIVE' }],
+  ['patch', `/api/v1/admin/marketplace/contact-requests/${contactRequestId}`, { status: 'APPROVED' }],
+  ['patch', `/api/v1/admin/marketplace/quotes/${quoteId}`, { status: 'VIEWED' }],
+  ['patch', `/api/v1/admin/marketplace/reports/${reportId}`, { status: 'REVIEWING' }]
 ];
 
 describe('administrator role authorization', () => {
@@ -76,5 +83,21 @@ describe('administrator mutation validation', () => {
 
   it('rejects an unsupported match field', async () => {
     await patch(`/api/v1/admin/matches/${matchId}`, { secretFlag: true }).expect(422);
+  });
+
+  it('rejects an invalid marketplace lead status transition value', async () => {
+    await patch(`/api/v1/admin/marketplace/leads/${leadId}`, { marketplaceStatus: 'TELEPORTED' }).expect(422);
+  });
+
+  it('rejects an invalid marketplace contact request status', async () => {
+    await patch(`/api/v1/admin/marketplace/contact-requests/${contactRequestId}`, { status: 'MAYBE' }).expect(422);
+  });
+
+  it('rejects an invalid marketplace quote status', async () => {
+    await patch(`/api/v1/admin/marketplace/quotes/${quoteId}`, { status: 'MAYBE' }).expect(422);
+  });
+
+  it('rejects an invalid marketplace report status', async () => {
+    await patch(`/api/v1/admin/marketplace/reports/${reportId}`, { status: 'MAYBE' }).expect(422);
   });
 });

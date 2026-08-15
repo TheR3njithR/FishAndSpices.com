@@ -35,6 +35,13 @@ const verificationFields = {
 };
 const CONTACT_METHODS = ['Email', 'Telephone', 'WhatsApp', 'Video call', 'In person', 'Message', 'Other'];
 const MATCH_STATUS = ['Proposed', 'Reviewing', 'Consented', 'Introduced', 'Declined', 'Closed'];
+const MARKETPLACE_MODERATION_STATUS = ['PENDING_REVIEW', 'APPROVED', 'REJECTED'];
+const MARKETPLACE_STATUS = ['DRAFT', 'PENDING_VERIFICATION', 'PENDING_REVIEW', 'ACTIVE', 'PAUSED', 'MATCHED', 'CLOSED', 'SOLD', 'EXPIRED', 'REJECTED', 'ARCHIVED'];
+const MARKETPLACE_VISIBILITY = ['PUBLIC', 'PRIVATE', 'PUBLIC_AND_MATCHING'];
+const CONTACT_REQUEST_STATUS = ['PENDING', 'APPROVED', 'DECLINED', 'CANCELLED', 'CLOSED'];
+const CONTACT_REQUEST_CONSENT = ['PENDING', 'GRANTED', 'REVOKED', 'DECLINED'];
+const QUOTE_STATUS = ['SUBMITTED', 'VIEWED', 'ACCEPTED', 'DECLINED', 'WITHDRAWN', 'EXPIRED'];
+const REPORT_STATUS = ['OPEN', 'REVIEWING', 'RESOLVED', 'DISMISSED'];
 
 function badRequest(message) {
   const error = new Error(message);
@@ -82,6 +89,19 @@ function optionalAmount(value, label) {
   const numeric = Number(value);
   if (!Number.isFinite(numeric) || numeric < 0) throw badRequest(`Invalid ${label}.`);
   return numeric;
+}
+
+function optionalInt(value, fallback = 50) {
+  if (value === undefined || value === null || value === '') return fallback;
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) throw badRequest('Limit must be a number.');
+  return Math.min(Math.max(Math.trunc(numeric), 1), 100);
+}
+
+function optionalEnum(value, allowed, label) {
+  if (value === undefined || value === null || value === '') return null;
+  if (!allowed.includes(value)) throw badRequest(`Invalid ${label}.`);
+  return value;
 }
 
 function booleanFlag(value, label) {
@@ -338,6 +358,346 @@ export function createAdminRouter({ config, pool }) {
       });
       if(!match)return response.status(404).json({success:false,error:'Match not found.'}); response.json({success:true,match});
     } catch(error){next(error);}
+  });
+
+  router.get('/marketplace/leads', async (request, response, next) => {
+    try {
+      const conditions = ['l.archived_at is null'];
+      const values = [];
+      const add = (sql, value) => { values.push(value); conditions.push(sql.replace('?', `$${values.length}`)); };
+
+      const role = optionalEnum(request.query.role, ['buyer', 'seller'], 'marketplace role');
+      const category = request.query.category ? String(request.query.category).trim().toLowerCase() : null;
+      const moderationStatus = optionalEnum(request.query.moderationStatus, MARKETPLACE_MODERATION_STATUS, 'marketplace moderation status');
+      const marketplaceStatus = optionalEnum(request.query.marketplaceStatus, MARKETPLACE_STATUS, 'marketplace status');
+      const visibility = optionalEnum(request.query.visibility, MARKETPLACE_VISIBILITY, 'marketplace visibility');
+
+      if (role) add('l.lead_role = ?', role);
+      if (category) add('lower(l.category) = ?', category);
+      if (moderationStatus) add('l.marketplace_moderation_status = ?', moderationStatus);
+      if (marketplaceStatus) add('l.marketplace_status = ?', marketplaceStatus);
+      if (visibility) add('l.marketplace_visibility = ?', visibility);
+      if (request.query.q) {
+        const query = `%${String(request.query.q).trim()}%`;
+        values.push(query, query, query, query);
+        conditions.push(`(l.public_reference ilike $${values.length - 3} or l.product ilike $${values.length - 2} or l.marketplace_slug ilike $${values.length - 1} or o.name ilike $${values.length})`);
+      }
+
+      const limit = optionalInt(request.query.limit);
+      values.push(limit);
+      const result = await pool.query(`
+        select
+          l.id,
+          l.public_reference as "publicReference",
+          l.marketplace_slug as slug,
+          l.marketplace_title as title,
+          l.lead_role as role,
+          l.category,
+          l.product,
+          l.quantity,
+          l.unit,
+          l.marketplace_visibility as visibility,
+          l.marketplace_moderation_status as "moderationStatus",
+          l.marketplace_status as "marketplaceStatus",
+          l.verification_status as "verificationStatus",
+          coalesce(l.marketplace_published_at, l.submitted_at) as "publishedAt",
+          l.marketplace_expires_at as "expiresAt",
+          o.name as organisation
+        from leads l
+        join organisations o on o.id = l.organisation_id
+        where ${conditions.join(' and ')}
+        order by coalesce(l.marketplace_published_at, l.submitted_at) desc
+        limit $${values.length}
+      `, values);
+      response.json({ success: true, leads: result.rows });
+    } catch (error) { next(error); }
+  });
+
+  router.patch('/marketplace/leads/:id', requireRole(WRITE_ROLES), requireCsrf, async (request, response, next) => {
+    try {
+      requireUuid(request.params.id, 'lead identifier');
+      const updates = [];
+      const values = [];
+
+      const moderationStatus = optionalEnum(request.body.moderationStatus, MARKETPLACE_MODERATION_STATUS, 'moderation status');
+      const marketplaceStatus = optionalEnum(request.body.marketplaceStatus, MARKETPLACE_STATUS, 'marketplace status');
+      const visibility = optionalEnum(request.body.visibility, MARKETPLACE_VISIBILITY, 'marketplace visibility');
+      const note = optionalText(request.body.note, 2000, 'Note');
+      const reason = optionalText(request.body.reason, 500, 'Reason');
+
+      if (moderationStatus) { values.push(moderationStatus); updates.push(`marketplace_moderation_status = $${values.length}`); }
+      if (marketplaceStatus) { values.push(marketplaceStatus); updates.push(`marketplace_status = $${values.length}`); }
+      if (visibility) { values.push(visibility); updates.push(`marketplace_visibility = $${values.length}`); }
+
+      if (request.body.expiresAt !== undefined) {
+        if (request.body.expiresAt === null || request.body.expiresAt === '') updates.push('marketplace_expires_at = null');
+        else if (typeof request.body.expiresAt !== 'string' || Number.isNaN(Date.parse(request.body.expiresAt))) throw badRequest('Invalid expiresAt.');
+        else { values.push(request.body.expiresAt); updates.push(`marketplace_expires_at = $${values.length}`); }
+      }
+
+      if (!updates.length && !note) return response.status(422).json({ success: false, error: 'No supported marketplace changes provided.' });
+
+      const updated = await withTransaction(pool, async client => {
+        const previous = await client.query(`
+          select id, marketplace_moderation_status, marketplace_status, marketplace_visibility
+          from leads where id = $1 for update
+        `, [request.params.id]);
+        if (!previous.rowCount) return null;
+
+        let lead = null;
+        if (updates.length) {
+          updates.push('marketplace_last_activity_at = now()');
+          values.push(request.params.id);
+          const result = await client.query(`
+            update leads
+            set ${updates.join(', ')}
+            where id = $${values.length}
+            returning id, public_reference as "publicReference", marketplace_slug as slug,
+              marketplace_moderation_status as "moderationStatus", marketplace_status as "marketplaceStatus",
+              marketplace_visibility as visibility, marketplace_expires_at as "expiresAt"
+          `, values);
+          lead = result.rows[0];
+        } else {
+          const current = await client.query(`
+            select id, public_reference as "publicReference", marketplace_slug as slug,
+              marketplace_moderation_status as "moderationStatus", marketplace_status as "marketplaceStatus",
+              marketplace_visibility as visibility, marketplace_expires_at as "expiresAt"
+            from leads where id = $1
+          `, [request.params.id]);
+          lead = current.rows[0];
+        }
+
+        if (marketplaceStatus && marketplaceStatus !== previous.rows[0].marketplace_status) {
+          await client.query(`
+            insert into fas_listing_status_history (
+              lead_id, previous_status, new_status, actor_type, actor_admin_id, metadata
+            ) values ($1,$2,$3,'administrator',$4,$5)
+          `, [request.params.id, previous.rows[0].marketplace_status, marketplaceStatus, request.adminSession.user.id, JSON.stringify({ reason })]);
+        }
+
+        if (note) {
+          await client.query(`
+            insert into fas_admin_notes (lead_id, administrator_id, note)
+            values ($1,$2,$3)
+          `, [request.params.id, request.adminSession.user.id, note]);
+        }
+
+        await writeAudit(client, {
+          administratorId: request.adminSession.user.id,
+          action: 'marketplace_lead_updated',
+          entityType: 'lead',
+          entityIdentifier: request.params.id,
+          previousValues: previous.rows[0],
+          newValues: lead
+        });
+        return lead;
+      });
+
+      if (!updated) return response.status(404).json({ success: false, error: 'Lead not found.' });
+      response.json({ success: true, lead: updated });
+    } catch (error) { next(error); }
+  });
+
+  router.get('/marketplace/contact-requests', async (request, response, next) => {
+    try {
+      const status = optionalEnum(request.query.status, CONTACT_REQUEST_STATUS, 'contact request status');
+      const limit = optionalInt(request.query.limit);
+      const values = [];
+      let where = '';
+      if (status) {
+        values.push(status);
+        where = `where cr.status = $${values.length}`;
+      }
+      values.push(limit);
+      const result = await pool.query(`
+        select
+          cr.id,
+          cr.status,
+          cr.consent_status as "consentStatus",
+          cr.message,
+          cr.created_at as "createdAt",
+          cr.responded_at as "respondedAt",
+          l.id as "leadId",
+          l.public_reference as "leadReference",
+          l.marketplace_slug as "leadSlug",
+          l.product,
+          requester.display_name as "requesterName"
+        from fas_contact_requests cr
+        join leads l on l.id = cr.target_lead_id
+        left join fas_customer_users requester on requester.id = cr.requester_user_id
+        ${where}
+        order by cr.created_at desc
+        limit $${values.length}
+      `, values);
+      response.json({ success: true, contactRequests: result.rows });
+    } catch (error) { next(error); }
+  });
+
+  router.patch('/marketplace/contact-requests/:id', requireRole(WRITE_ROLES), requireCsrf, async (request, response, next) => {
+    try {
+      requireUuid(request.params.id, 'contact request identifier');
+      const status = optionalEnum(request.body.status, CONTACT_REQUEST_STATUS, 'contact request status');
+      const consentStatus = optionalEnum(request.body.consentStatus, CONTACT_REQUEST_CONSENT, 'consent status');
+      if (!status && !consentStatus) throw badRequest('No supported changes provided.');
+
+      const values = [];
+      const updates = [];
+      if (status) { values.push(status); updates.push(`status = $${values.length}`); }
+      if (consentStatus) { values.push(consentStatus); updates.push(`consent_status = $${values.length}`); }
+      updates.push(`responded_at = ${status && status !== 'PENDING' ? 'now()' : 'responded_at'}`);
+
+      const updated = await withTransaction(pool, async client => {
+        const previous = await client.query('select * from fas_contact_requests where id = $1 for update', [request.params.id]);
+        if (!previous.rowCount) return null;
+        values.push(request.params.id);
+        const result = await client.query(`
+          update fas_contact_requests
+          set ${updates.join(', ')}
+          where id = $${values.length}
+          returning *
+        `, values);
+        await writeAudit(client, {
+          administratorId: request.adminSession.user.id,
+          action: 'contact_request_updated',
+          entityType: 'contact_request',
+          entityIdentifier: request.params.id,
+          previousValues: previous.rows[0],
+          newValues: result.rows[0]
+        });
+        return result.rows[0];
+      });
+      if (!updated) return response.status(404).json({ success: false, error: 'Contact request not found.' });
+      response.json({ success: true, contactRequest: updated });
+    } catch (error) { next(error); }
+  });
+
+  router.get('/marketplace/quotes', async (request, response, next) => {
+    try {
+      const status = optionalEnum(request.query.status, QUOTE_STATUS, 'quote status');
+      const limit = optionalInt(request.query.limit);
+      const values = [];
+      let where = '';
+      if (status) {
+        values.push(status);
+        where = `where q.status = $${values.length}`;
+      }
+      values.push(limit);
+      const result = await pool.query(`
+        select
+          q.id,
+          q.status,
+          q.quantity,
+          q.unit,
+          q.unit_price as "unitPrice",
+          q.currency,
+          q.valid_until as "validUntil",
+          q.created_at as "createdAt",
+          requirement.public_reference as "requirementReference",
+          requirement.marketplace_slug as "requirementSlug",
+          seller.public_reference as "sellerReference",
+          seller.marketplace_slug as "sellerSlug"
+        from fas_quotes q
+        join leads requirement on requirement.id = q.requirement_lead_id
+        left join leads seller on seller.id = q.seller_lead_id
+        ${where}
+        order by q.created_at desc
+        limit $${values.length}
+      `, values);
+      response.json({ success: true, quotes: result.rows });
+    } catch (error) { next(error); }
+  });
+
+  router.patch('/marketplace/quotes/:id', requireRole(WRITE_ROLES), requireCsrf, async (request, response, next) => {
+    try {
+      requireUuid(request.params.id, 'quote identifier');
+      const status = optionalEnum(request.body.status, QUOTE_STATUS, 'quote status');
+      if (!status) throw badRequest('No supported changes provided.');
+
+      const updated = await withTransaction(pool, async client => {
+        const previous = await client.query('select * from fas_quotes where id = $1 for update', [request.params.id]);
+        if (!previous.rowCount) return null;
+        const result = await client.query('update fas_quotes set status = $1 where id = $2 returning *', [status, request.params.id]);
+        await writeAudit(client, {
+          administratorId: request.adminSession.user.id,
+          action: 'quote_updated',
+          entityType: 'quote',
+          entityIdentifier: request.params.id,
+          previousValues: previous.rows[0],
+          newValues: result.rows[0]
+        });
+        return result.rows[0];
+      });
+      if (!updated) return response.status(404).json({ success: false, error: 'Quote not found.' });
+      response.json({ success: true, quote: updated });
+    } catch (error) { next(error); }
+  });
+
+  router.get('/marketplace/reports', async (request, response, next) => {
+    try {
+      const status = optionalEnum(request.query.status, REPORT_STATUS, 'report status');
+      const limit = optionalInt(request.query.limit);
+      const values = [];
+      let where = '';
+      if (status) {
+        values.push(status);
+        where = `where r.status = $${values.length}`;
+      }
+      values.push(limit);
+      const result = await pool.query(`
+        select
+          r.id,
+          r.reason,
+          r.details,
+          r.status,
+          r.created_at as "createdAt",
+          l.id as "leadId",
+          l.public_reference as "leadReference",
+          l.marketplace_slug as "leadSlug",
+          l.product
+        from fas_reports r
+        join leads l on l.id = r.lead_id
+        ${where}
+        order by r.created_at desc
+        limit $${values.length}
+      `, values);
+      response.json({ success: true, reports: result.rows });
+    } catch (error) { next(error); }
+  });
+
+  router.patch('/marketplace/reports/:id', requireRole(WRITE_ROLES), requireCsrf, async (request, response, next) => {
+    try {
+      requireUuid(request.params.id, 'report identifier');
+      const status = optionalEnum(request.body.status, REPORT_STATUS, 'report status');
+      const note = optionalText(request.body.note, 2000, 'Note');
+      if (!status && !note) throw badRequest('No supported changes provided.');
+
+      const updated = await withTransaction(pool, async client => {
+        const previous = await client.query('select * from fas_reports where id = $1 for update', [request.params.id]);
+        if (!previous.rowCount) return null;
+        let report = previous.rows[0];
+        if (status) {
+          const result = await client.query('update fas_reports set status = $1 where id = $2 returning *', [status, request.params.id]);
+          report = result.rows[0];
+        }
+        if (note) {
+          await client.query(`
+            insert into fas_admin_notes (lead_id, administrator_id, note)
+            values ($1,$2,$3)
+          `, [report.lead_id, request.adminSession.user.id, note]);
+        }
+        await writeAudit(client, {
+          administratorId: request.adminSession.user.id,
+          action: 'report_updated',
+          entityType: 'report',
+          entityIdentifier: request.params.id,
+          previousValues: previous.rows[0],
+          newValues: report
+        });
+        return report;
+      });
+      if (!updated) return response.status(404).json({ success: false, error: 'Report not found.' });
+      response.json({ success: true, report: updated });
+    } catch (error) { next(error); }
   });
 
   router.get('/audit', requireAuthentication({ pool, config, roles: ['administrator','super_admin'] }), async (request,response,next)=>{
