@@ -7,6 +7,9 @@ const { Client } = pg;
 const connectionString = process.env.DATABASE_UNPOOLED_URL || process.env.DATABASE_URL;
 if (!connectionString) throw new Error('DATABASE_UNPOOLED_URL or DATABASE_URL is required for migrations.');
 
+const checksumFor = (sql) => createHash('sha256').update(sql).digest('hex');
+const canonicalizeSql = (sql) => sql.replace(/^\uFEFF/, '').replace(/\r\n/g, '\n');
+
 const directory = resolve(import.meta.dirname, '..', 'db', 'migrations');
 const files = (await readdir(directory)).filter(file => /^\d+_.+\.sql$/.test(file)).sort();
 const client = new Client({ connectionString, application_name: 'fish-and-spices-migrations' });
@@ -22,10 +25,18 @@ try {
 
   for (const file of files) {
     const sql = await readFile(join(directory, file), 'utf8');
-    const checksum = createHash('sha256').update(sql).digest('hex');
+    const checksum = checksumFor(canonicalizeSql(sql));
+    const legacyChecksum = checksumFor(sql);
     const existing = await client.query('select checksum from schema_migrations where version = $1', [file]);
     if (existing.rowCount) {
-      if (existing.rows[0].checksum !== checksum) throw new Error(`Applied migration checksum changed: ${file}`);
+      const existingChecksum = existing.rows[0].checksum;
+      if (existingChecksum !== checksum && existingChecksum !== legacyChecksum) {
+        throw new Error(`Applied migration checksum changed: ${file}`);
+      }
+      if (existingChecksum !== checksum) {
+        await client.query('update schema_migrations set checksum = $2 where version = $1', [file, checksum]);
+        console.log(`Migration checksum normalized: ${file}`);
+      }
       console.log(`Migration already applied: ${file}`);
       continue;
     }
