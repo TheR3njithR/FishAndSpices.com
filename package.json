@@ -1,0 +1,33 @@
+{
+  "name": "fish-and-spices-platform",
+  "version": "3.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22 <25"
+  },
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node --watch server/index.js",
+    "migrate": "node scripts/migrate.mjs",
+    "bootstrap-admin": "node scripts/bootstrap-admin.mjs",
+    "cleanup-test-data": "node scripts/cleanup-test-data.mjs",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "check": "node scripts/check-site.mjs && node scripts/check-js.mjs"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "compression": "^1.8.1",
+    "cookie-parser": "^1.4.7",
+    "express": "^5.1.0",
+    "helmet": "^8.1.0",
+    "libphonenumber-js": "^1.13.11",
+    "pg": "^8.16.3",
+    "zod": "^4.0.17"
+  },
+  "devDependencies": {
+    "supertest": "^7.1.4",
+    "vitest": "^3.2.4"
+  }
+}

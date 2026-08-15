@@ -1,18 +1,31 @@
+import('./i18n.js');
+
 const header = document.querySelector('[data-header]');
 const menuButton = document.querySelector('.menu-toggle');
 const navigation = document.querySelector('#site-navigation');
 
+const menuText = value => window.FS_I18N?.text(value) || value;
+
+if (header && !header.querySelector('[data-customer-sign-in]')) {
+  const signIn = document.createElement('a');
+  signIn.className = 'customer-sign-in';
+  signIn.href = 'account.html';
+  signIn.dataset.customerSignIn = '';
+  signIn.textContent = 'Sign in';
+  header.querySelector('.header-inner')?.insertBefore(signIn, header.querySelector('.language-control, .header-actions'));
+}
+
 const closeMenu = () => {
   if (!menuButton || !header) return;
   menuButton.setAttribute('aria-expanded', 'false');
-  menuButton.querySelector('.sr-only').textContent = 'Open menu';
+  menuButton.querySelector('.sr-only').textContent = menuText('Open menu');
   header.classList.remove('menu-open');
 };
 
 menuButton?.addEventListener('click', () => {
   const isOpen = menuButton.getAttribute('aria-expanded') === 'true';
   menuButton.setAttribute('aria-expanded', String(!isOpen));
-  menuButton.querySelector('.sr-only').textContent = isOpen ? 'Open menu' : 'Close menu';
+  menuButton.querySelector('.sr-only').textContent = menuText(isOpen ? 'Open menu' : 'Close menu');
   header.classList.toggle('menu-open', !isOpen);
 });
 

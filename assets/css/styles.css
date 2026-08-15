@@ -92,6 +92,14 @@
   .site-nav a::after { position: absolute; right: 0; bottom: -7px; left: 0; height: 2px; content: ""; background: var(--coral-500); transform: scaleX(0); transform-origin: left; transition: transform .2s ease; }
   .site-nav a:hover::after { transform: scaleX(1); }
   .header-actions { display: flex; gap: 8px; }
+  .customer-sign-in { flex: 0 0 auto; padding: 9px 4px; border-bottom: 1px solid currentColor; font-size: .76rem; font-weight: 720; text-decoration: none; white-space: nowrap; }
+  .language-control { display: inline-flex; flex: 0 0 auto; height: 36px; align-items: center; gap: 5px; padding-inline: 9px 5px; border: 1px solid rgb(255 255 255 / .55); color: currentColor; background: rgb(3 24 35 / .16); }
+  .language-control > span { font-size: .76rem; font-weight: 800; }
+  .language-control select { width: 88px; border: 0; color: inherit; background: transparent; font: inherit; font-size: .76rem; font-weight: 700; cursor: pointer; }
+  .language-control select:focus-visible { outline: 2px solid var(--amber-300); outline-offset: 2px; }
+  .language-control option { color: var(--graphite); background: var(--white); }
+  .site-header.is-scrolled .language-control, .site-header.menu-open .language-control { border-color: var(--line); background: var(--sand-50); }
+  .language-control-floating { position: fixed; z-index: 110; top: 12px; right: 12px; color: var(--graphite); background: var(--white); box-shadow: 0 4px 20px rgb(4 31 48 / .14); }
   .site-header:not(.is-scrolled):not(.menu-open) .button-light { color: var(--white); background: transparent; border-color: rgb(255 255 255 / .6); }
   .menu-toggle { display: none; width: 44px; height: 44px; padding: 10px; border: 0; color: currentColor; background: transparent; cursor: pointer; }
   .menu-toggle span:not(.sr-only) { display: block; width: 23px; height: 2px; margin: 5px auto; background: currentColor; transition: transform .2s ease, opacity .2s ease; }
@@ -292,6 +300,14 @@
   }
 
   @media (max-width: 420px) {
+    .header-inner { gap: 5px; padding-inline: 12px; }
+    .brand { gap: 6px; }
+    .brand img { width: 34px; height: 34px; }
+    .brand-copy strong { font-size: .96rem; }
+    .menu-toggle { width: 38px; padding-inline: 7px; }
+    .language-control { gap: 2px; padding-inline: 5px 3px; }
+    .language-control > span { display: none; }
+    .language-control select { width: 72px; font-size: .7rem; }
     .hero-actions { grid-template-columns: 1fr; }
     .hero-actions .text-link { grid-column: auto; }
     .button { gap: 12px; }

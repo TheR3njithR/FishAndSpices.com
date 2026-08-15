@@ -5,8 +5,8 @@
   <title>Submit a Commercial Buying Requirement | Fish &amp; Spices</title>
   <meta name="description" content="Submit a qualified commercial requirement for fish, seafood or spices and generate a structured review summary for Fish & Spices.">
   <link rel="canonical" href="https://fishandspices.com/buy.html"><link rel="icon" href="assets/brand/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="assets/css/styles.css?v=3"><link rel="stylesheet" href="assets/css/pages.css?v=1">
-  <script src="assets/js/config.js" defer></script><script src="assets/js/main.js" defer></script><script src="assets/js/lead-form.js" defer></script>
+  <link rel="stylesheet" href="assets/css/styles.css?v=5"><link rel="stylesheet" href="assets/css/pages.css?v=4">
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" defer></script><script src="assets/js/config.js" defer></script><script src="assets/js/main.js?v=3" defer></script><script type="module" src="assets/js/lead-form.js?v=4"></script>
 </head>
 <body class="inner-page">
   <a class="skip-link" href="#main-content">Skip to main content</a>
@@ -14,12 +14,12 @@
     <a class="brand" href="index.html" aria-label="Fish and Spices home"><img src="assets/brand/logo-mark.svg" width="46" height="46" alt=""><span class="brand-copy"><strong>Fish <span>&amp;</span> Spices</strong><small>Commercial supply network</small></span></a>
     <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-navigation"><span class="sr-only">Open menu</span><span></span><span></span><span></span></button>
     <nav id="site-navigation" class="site-nav" aria-label="Primary navigation"><a aria-current="page" href="buy.html">Buy</a><a href="sell.html">Sell</a><a href="fish.html">Fish</a><a href="spices.html">Spices</a><a href="how-it-works.html">Managed Matching</a><a href="index.html#market-information">Market Intelligence</a><a href="safety.html">Safety</a><a href="contact.html">Contact</a></nav>
-    <div class="header-actions"><a class="button button-small button-light" href="buy.html">Post Requirement</a><a class="button button-small button-coral" href="sell.html">List Stock</a></div>
+    <div class="header-actions"><a class="button button-small button-light" href="buy.html">Post your requirement</a><a class="button button-small button-coral" href="sell.html">Offer your product</a></div>
   </div></header>
   <main id="main-content" class="page-main">
-    <section class="page-hero page-hero-split"><div class="page-shell page-hero-content"><p class="eyebrow eyebrow-light">Commercial buyer intake</p><h1>Submit a defined buying requirement.</h1><p>Choose fish or spices first. We will ask only the category-specific questions needed to qualify a potential sourcing introduction.</p></div></section>
+    <section class="page-hero page-hero-split"><div class="page-shell page-hero-content"><p class="eyebrow eyebrow-light">No account required · Takes approximately 2 minutes</p><h1>Post your buying requirement.</h1><p>Share the commercial minimum now. Additional product details can be requested progressively during private qualification.</p></div></section>
     <section class="page-section"><div class="page-shell">
-      <div class="choice-intro"><div><p class="eyebrow">Step 1 / Choose a category</p><h2>What do you need to buy?</h2></div><p>Have your product specification, quantity, destination, required date, packing needs and relevant quality requirements ready before beginning.</p></div>
+      <div class="choice-intro"><div><p class="eyebrow">Step 1 / Choose a category</p><h2>What do you need to buy?</h2></div><p>Your information remains private until an approved introduction. You can leave after submission without activating an account.</p></div>
       <div class="journey-picker" data-journey-picker>
         <button class="journey-choice" type="button" data-category="fish" aria-pressed="false"><span>Buyer journey</span><strong>Buy Fish or Seafood</strong><small>Species, form, size, cold chain, packing and processing requirements.</small></button>
         <button class="journey-choice" type="button" data-category="spices" aria-pressed="false"><span>Buyer journey</span><strong>Buy Spices</strong><small>Variety, form, grade, quality parameters, packing and laboratory needs.</small></button>
@@ -28,11 +28,11 @@
       <div class="lead-workspace" data-lead-workspace hidden>
         <ol class="progress-bar" aria-label="Submission progress"><li class="is-active">Choose category</li><li class="is-active">Add requirement</li><li>Review and send</li></ol>
         <form class="lead-form" data-lead-form data-role="buyer" novalidate>
-          <div class="error-summary" data-errors tabindex="-1" hidden></div><div data-fields></div>
-          <div class="form-actions"><button class="button button-dark" type="submit" data-generate>Generate review summary <span aria-hidden="true">→</span></button></div>
-          <p class="privacy-note">Your data is used only to generate this review and your chosen WhatsApp or email message. It is not permanently stored in this browser. Submission does not guarantee matching or a transaction.</p>
+          <div class="error-summary" data-errors tabindex="-1" hidden></div><div data-fields></div><div class="form-trap" aria-hidden="true"><label for="buyer-website-url">Leave this field empty</label><input id="buyer-website-url" name="websiteUrl" type="text" tabindex="-1" autocomplete="off"></div>
+          <div class="form-actions"><button class="button button-dark" type="submit" data-generate>Review requirement <span aria-hidden="true">→</span></button></div>
+          <p class="privacy-note">Your information remains in this page until you submit. A successful secure submission stores it for qualification, follow-up and consent-based matching. Submission does not guarantee matching or a transaction.</p>
         </form>
-        <section class="review-panel" data-review tabindex="-1" hidden aria-labelledby="review-title"><div class="review-head"><div><p class="eyebrow eyebrow-light">Step 3 / Confirm</p><h2 id="review-title">Review before sending</h2></div><span class="lead-reference" data-reference></span></div><pre class="review-summary" data-summary></pre><div class="review-actions"><button class="button button-light" type="button" data-edit>Edit details</button><a class="button button-buy" data-whatsapp target="_blank" rel="noopener noreferrer">Send by WhatsApp</a><a class="button button-coral" data-email>Send by email</a></div><p class="review-note">These buttons open your messaging application. Fish &amp; Spices receives nothing unless you complete the send action there.</p></section>
+        <section class="review-panel" data-review tabindex="-1" hidden aria-labelledby="review-title"><div class="review-head"><div><p class="eyebrow eyebrow-light">Step 3 / Confirm</p><h2 id="review-title">Review and submit securely</h2></div><span class="lead-reference" data-reference></span></div><pre class="review-summary" data-summary></pre><div class="turnstile-control" data-turnstile></div><p class="submit-status" data-submit-status aria-live="polite"></p><div class="review-actions"><button class="button button-light" type="button" data-edit>Edit details</button><button class="button button-coral" type="button" data-submit-lead disabled>Submit requirement</button><a class="button button-buy" href="account.html" data-track hidden>Track with mobile OTP</a><a class="button button-light" href="index.html" data-continue hidden>Continue without account</a><a class="button button-buy" data-whatsapp target="_blank" rel="noopener noreferrer" hidden>Follow up on WhatsApp</a></div><p class="review-note">After successful storage, you receive a public reference. Any WhatsApp follow-up contains only that reference, not your full submission.</p></section>
       </div>
     </div></section>
   </main>

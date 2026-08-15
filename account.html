@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Track Your Enquiries | Fish &amp; Spices</title>
+  <meta name="description" content="Use a one-time code to privately track your Fish & Spices buying requirements and selling offers.">
+  <meta name="robots" content="noindex,nofollow">
+  <link rel="icon" href="assets/brand/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/styles.css?v=5"><link rel="stylesheet" href="assets/css/pages.css?v=4"><link rel="stylesheet" href="assets/css/account.css?v=1">
+  <script src="assets/js/main.js?v=3" defer></script><script src="assets/js/account.js?v=1" defer></script>
+</head>
+<body class="inner-page">
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <header class="site-header is-scrolled" data-header><div class="header-inner">
+    <a class="brand" href="index.html" aria-label="Fish and Spices home"><img src="assets/brand/logo-mark.svg" width="46" height="46" alt=""><span class="brand-copy"><strong>Fish <span>&amp;</span> Spices</strong><small>Commercial supply network</small></span></a>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-navigation"><span class="sr-only">Open menu</span><span></span><span></span><span></span></button>
+    <nav id="site-navigation" class="site-nav" aria-label="Primary navigation"><a href="buy.html">Buy</a><a href="sell.html">Sell</a><a href="fish.html">Fish</a><a href="spices.html">Spices</a><a href="how-it-works.html">Managed Matching</a><a href="safety.html">Safety</a><a href="contact.html">Contact</a></nav>
+  </div></header>
+  <main id="main-content" class="page-main account-main">
+    <section class="account-intro"><div class="page-shell"><p class="eyebrow">Passwordless access</p><h1>Track your enquiries.</h1><p>Enter the mobile number or email used in your submission. No username or password is required.</p></div></section>
+    <section class="page-section"><div class="account-shell">
+      <section class="auth-panel" data-auth-panel aria-labelledby="signin-title">
+        <div><p class="eyebrow">Private sign in</p><h2 id="signin-title">Verify your contact</h2><p>We will send a short-lived, single-use code when a delivery provider is available.</p></div>
+        <form data-challenge-form novalidate>
+          <fieldset class="contact-method"><legend>Where should we send the code?</legend><label><input type="radio" name="type" value="mobile" checked> Mobile</label><label><input type="radio" name="type" value="email"> Email</label></fieldset>
+          <label for="auth-destination">Mobile number with country code or email</label>
+          <input id="auth-destination" name="destination" type="text" inputmode="tel" autocomplete="username" required>
+          <button class="button button-dark" type="submit">Send one-time code</button>
+        </form>
+        <form data-verify-form hidden novalidate>
+          <p data-masked-destination></p><label for="auth-code">Six-digit code</label>
+          <input id="auth-code" name="code" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" required>
+          <div class="auth-actions"><button class="button button-dark" type="submit">Verify and view enquiries</button><button class="text-button" type="button" data-start-over>Use a different contact</button></div>
+        </form>
+        <p class="auth-status" data-auth-status role="status" aria-live="polite"></p>
+        <p class="privacy-note">A public lead reference alone cannot open an enquiry. Verification is required to view private responses.</p>
+      </section>
+
+      <section data-dashboard hidden aria-labelledby="dashboard-title">
+        <div class="dashboard-head"><div><p class="eyebrow">Your private workspace</p><h2 id="dashboard-title">Buying requirements and selling offers</h2><p data-verification-level></p></div><div class="dashboard-actions"><button class="button button-light" type="button" data-claim-history>Check for earlier enquiries</button><button class="text-button" type="button" data-logout>Sign out</button></div></div>
+        <p class="auth-status" data-dashboard-status role="status" aria-live="polite"></p>
+        <div class="lead-history" data-lead-history></div>
+      </section>
+    </div></section>
+  </main>
+</body>
+</html>
