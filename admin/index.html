@@ -5,8 +5,8 @@
   <meta name="robots" content="noindex,nofollow">
   <title>Administrator Sign In | Fish &amp; Spices</title>
   <link rel="icon" href="../assets/brand/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="../assets/css/styles.css?v=3"><link rel="stylesheet" href="../assets/css/pages.css?v=2"><link rel="stylesheet" href="/admin/admin.css?v=2">
-  <script src="/admin/admin.js?v=2" defer></script>
+  <link rel="stylesheet" href="../assets/css/styles.css?v=3"><link rel="stylesheet" href="../assets/css/pages.css?v=2"><link rel="stylesheet" href="/admin/admin.css?v=3">
+  <script src="/admin/admin.js?v=3" defer></script>
 </head>
 <body class="inner-page admin-page">
   <a class="skip-link" href="#main-content">Skip to main content</a>
@@ -19,6 +19,7 @@
       <form class="admin-filters" data-lead-filters><div class="field"><label for="filter-query">Search</label><input id="filter-query" name="q" type="search" placeholder="Reference, product, company or contact"></div><div class="field"><label for="filter-role">Role</label><select id="filter-role" name="role"><option value="">All roles</option><option value="buyer">Buyer</option><option value="seller">Seller</option></select></div><div class="field"><label for="filter-category">Category</label><select id="filter-category" name="category"><option value="">All categories</option><option value="fish">Fish</option><option value="spices">Spices</option></select></div><div class="field"><label for="filter-status">Status</label><select id="filter-status" name="status"><option value="">All statuses</option><option>New</option><option>In review</option><option>Verified</option><option>Potential match</option><option>Follow-up due</option><option>Closed</option></select></div><button class="button button-dark button-small" type="submit">Apply</button></form>
       <p class="admin-status" data-workspace-status aria-live="polite"></p>
       <div class="admin-workspace"><section class="lead-list" aria-labelledby="lead-list-title"><div class="panel-heading"><h2 id="lead-list-title">Lead queue</h2><button class="button button-small button-light" type="button" data-refresh>Refresh</button></div><div class="lead-table-wrap"><table><thead><tr><th>Reference</th><th>Lead</th><th>Product</th><th>Status</th><th>Submitted</th></tr></thead><tbody data-lead-rows></tbody></table></div></section><aside class="lead-detail" data-lead-detail aria-labelledby="detail-title"><div class="empty-detail"><h2 id="detail-title">Select a lead</h2><p>Open a queue record to qualify, verify, follow up or match it.</p></div></aside></div>
+      <section class="admin-master" data-master-data aria-labelledby="master-title"><div class="panel-heading"><h2 id="master-title">Master data</h2><button class="button button-small button-light" type="button" data-refresh-master>Refresh</button></div><p>Control which dropdown options appear on the public forms. Deactivate an option to hide it (for example, keep only India under Countries).</p><p class="admin-status" data-master-status aria-live="polite"></p><div data-master-sets></div></section>
     </section>
   </main>
 </body>

@@ -3,6 +3,7 @@ import { requireAuthentication, requireCsrf } from '../auth-middleware.js';
 import { withTransaction } from '../db.js';
 import { writeAudit } from '../services/audit.js';
 import { suggestMatches } from '../services/matching.js';
+import { createOption, getAdminOptions, MasterDataError, updateOption } from '../services/master-data.js';
 
 const allowedLeadUpdates = {
   verificationStatus: ['Pending', 'In review', 'Verified', 'Rejected'],
@@ -86,6 +87,15 @@ function optionalAmount(value, label) {
 function booleanFlag(value, label) {
   if (typeof value !== 'boolean') throw badRequest(`Invalid ${label}.`);
   return value;
+}
+
+function matchExplanation(value) {
+  if (value && typeof value === 'object' && !Array.isArray(value)) {
+    const json = JSON.stringify(value);
+    if (json.length > 8000) throw badRequest('Explanation is too large.');
+    return json;
+  }
+  return JSON.stringify({ summary: requiredText(value, 4000, 'Explanation') });
 }
 
 const matchValidators = {
@@ -298,10 +308,10 @@ export function createAdminRouter({ config, pool }) {
       requireUuid(request.body.buyerLeadId, 'buyer lead identifier'); requireUuid(request.body.sellerLeadId, 'seller lead identifier');
       const score = Number(request.body.score);
       if (!Number.isFinite(score) || score < 0 || score > 100) throw badRequest('Score must be a number between 0 and 100.');
-      const explanation = requiredText(request.body.explanation, 4000, 'Explanation');
+      const explanationJson = matchExplanation(request.body.explanation);
       const match = await withTransaction(pool, async client => {
         const result = await client.query(`insert into matches (buyer_lead_id, seller_lead_id, match_score, match_explanation, created_by)
-          values ($1,$2,$3,$4,$5) returning *`, [request.body.buyerLeadId, request.body.sellerLeadId, score, JSON.stringify({ summary: explanation }), request.adminSession.user.id]);
+          values ($1,$2,$3,$4,$5) returning *`, [request.body.buyerLeadId, request.body.sellerLeadId, score, explanationJson, request.adminSession.user.id]);
         await client.query(`update leads set match_status='Potential match' where id in ($1,$2)`, [request.body.buyerLeadId, request.body.sellerLeadId]);
         await writeAudit(client, { administratorId: request.adminSession.user.id, action: 'match_proposed', entityType: 'match', entityIdentifier: result.rows[0].id, newValues: result.rows[0] });
         return result.rows[0];
@@ -333,6 +343,44 @@ export function createAdminRouter({ config, pool }) {
   router.get('/audit', requireAuthentication({ pool, config, roles: ['administrator','super_admin'] }), async (request,response,next)=>{
     try { const result=await pool.query('select * from audit_log order by created_at desc limit $1',[Math.min(Number(request.query.limit)||100,250)]); response.json({success:true,audit:result.rows}); }
     catch(error){next(error);}
+  });
+
+  router.get('/options', async (_request, response, next) => {
+    try { response.json({ success: true, sets: await getAdminOptions(pool) }); }
+    catch (error) { next(error); }
+  });
+
+  router.post('/options', requireRole(WRITE_ROLES), requireCsrf, async (request, response, next) => {
+    try {
+      const option = await createOption(pool, {
+        setKey: request.body.setKey, value: request.body.value, label: request.body.label, sortOrder: request.body.sortOrder
+      });
+      await writeAudit(pool, {
+        administratorId: request.adminSession.user.id, action: 'master_option_created',
+        entityType: 'master_option', entityIdentifier: option.id, newValues: option
+      });
+      response.status(201).json({ success: true, option });
+    } catch (error) {
+      if (error instanceof MasterDataError) return response.status(error.status).json({ success: false, error: error.message });
+      next(error);
+    }
+  });
+
+  router.patch('/options/:id', requireRole(WRITE_ROLES), requireCsrf, async (request, response, next) => {
+    try {
+      requireUuid(request.params.id, 'option identifier');
+      const option = await updateOption(pool, request.params.id, {
+        label: request.body.label, sortOrder: request.body.sortOrder, isActive: request.body.isActive
+      });
+      await writeAudit(pool, {
+        administratorId: request.adminSession.user.id, action: 'master_option_updated',
+        entityType: 'master_option', entityIdentifier: option.id, newValues: option
+      });
+      response.json({ success: true, option });
+    } catch (error) {
+      if (error instanceof MasterDataError) return response.status(error.status).json({ success: false, error: error.message });
+      next(error);
+    }
   });
 
   return router;

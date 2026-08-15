@@ -34,6 +34,7 @@ import { requestCurrentPosition } from './device-location.js';
   const sellerTypes = ['Farmer', 'Fish farmer', 'Fishermen group', 'Aquaculture farm', 'Farmer organisation', 'Aggregator', 'Processor', 'Packer', 'Cold-storage operator', 'Wholesaler', 'Licensed exporter', 'Trading company', 'Other'];
   const yesNo = ['Yes', 'No', 'Not sure'];
   const units = ['kg', 'metric tonnes', 'pieces', 'cartons', 'bags', 'litres', 'Other'];
+  const incoterms = ['EXW', 'FCA', 'FOB', 'CFR', 'CIF', 'DAP', 'DDP', 'Not decided'];
   const callingCodes = ['+91', '+971', '+1', '+44', '+65', '+60', '+966', '+974', '+968', '+973', '+965'];
   const countryCodes = ['IN', 'AE', 'US', 'GB', 'SG', 'MY', 'SA', 'QA', 'OM', 'BH', 'KW', 'LK', 'BD', 'NP', 'MV', 'ID', 'TH', 'VN', 'AU', 'CA', 'DE', 'FR', 'NL', 'IT', 'ES', 'ZA', 'KE', 'TZ'];
   const callingCodeByCountry = { IN: '+91', AE: '+971', US: '+1', GB: '+44', SG: '+65', MY: '+60', SA: '+966', QA: '+974', OM: '+968', BH: '+973', KW: '+965' };
@@ -45,6 +46,27 @@ import { requestCurrentPosition } from './device-location.js';
 
   const field = (name, label, options = {}) => ({ name, label, type: 'text', ...options });
   const section = (title, description, fields) => ({ title, description, fields });
+
+  async function loadManagedOptions() {
+    try {
+      const response = await fetch('/api/v1/options', { headers: { accept: 'application/json' } });
+      if (!response.ok) return;
+      const { options } = await response.json();
+      const apply = (target, key) => {
+        const list = options?.[key];
+        if (Array.isArray(list) && list.length) {
+          target.length = 0;
+          list.forEach(item => target.push(item.value));
+        }
+      };
+      apply(countryCodes, 'countries');
+      apply(callingCodes, 'calling_codes');
+      apply(buyerTypes, 'buyer_types');
+      apply(sellerTypes, 'seller_types');
+      apply(incoterms, 'incoterms');
+    } catch { /* keep built-in defaults when options are unavailable */ }
+  }
+  loadManagedOptions();
 
   const sharedBuyer = [
     section('Buyer and company', 'Tell us who is responsible for this commercial requirement.', [
@@ -61,7 +83,7 @@ import { requestCurrentPosition } from './device-location.js';
       field('deliveryPort', 'Port name', { hint: 'Optional, when relevant' }), field('deliveryPostalCode', 'Pincode or postal code'),
       field('deliveryLocationType', 'Delivery location type', { type: 'select', options: ['Business premises', 'Warehouse', 'Port', 'Processing facility', 'Other'] }),
       field('deliveryNotes', 'Delivery location notes', { type: 'textarea', wide: true, hint: 'Optional. Do not include information that is not needed for qualification.' }),
-      field('requiredDate', 'Required date', { type: 'date', required: true }), field('incoterm', 'Preferred Incoterm', { type: 'select', required: true, options: ['EXW', 'FCA', 'FOB', 'CFR', 'CIF', 'DAP', 'DDP', 'Not decided'] }),
+      field('requiredDate', 'Required date', { type: 'date', required: true }), field('incoterm', 'Preferred Incoterm', { type: 'select', required: true, options: incoterms }),
       field('sampleRequirement', 'Sample requirement', { type: 'select', required: true, options: yesNo }), field('inspectionRequirement', 'Inspection requirement', { type: 'select', required: true, options: yesNo }),
       field('additionalNotes', 'Short requirement', { type: 'textarea', wide: true })
     ])

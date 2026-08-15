@@ -10,6 +10,8 @@
   const filters = document.querySelector('[data-lead-filters]');
   const rows = document.querySelector('[data-lead-rows]');
   const detail = document.querySelector('[data-lead-detail]');
+  const masterSets = document.querySelector('[data-master-sets]');
+  const masterStatus = document.querySelector('[data-master-status]');
         let csrfToken = '';
         let activeUser = null;
         let selectedLeadId = '';
@@ -46,7 +48,7 @@
           dashboard.hidden = false;
           signOut.hidden = false;
           identity.textContent = `${activeUser.displayName} · ${activeUser.role.replace('_', ' ')}`;
-          await Promise.all([loadOverview(), loadLeads()]);
+          await Promise.all([loadOverview(), loadLeads(), loadMasterData()]);
         }
 
         async function loadOverview() {
@@ -69,7 +71,6 @@
         }
 
         const detailItem = (label, value) => `<div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value || 'Not recorded')}</dd></div>`;
-
         async function loadLead(leadId) {
           selectedLeadId = leadId;
           workspaceStatus.textContent = 'Loading lead details...';
@@ -95,6 +96,31 @@
           await api(path, { method, body: JSON.stringify(body) });
         }
 
+        async function loadMasterData() {
+          if (!masterSets) return;
+          masterStatus.textContent = 'Loading master data...';
+          const { sets } = await api('/admin/options');
+          masterSets.innerHTML = sets.map(set => `
+            <details class="master-set"><summary>${escapeHtml(set.label)} <small>(${set.options.filter(option => option.isActive).length}/${set.options.length} active)</small></summary>
+              <div class="master-table-wrap"><table class="master-table"><thead><tr><th>Label</th><th>Value</th><th>Sort</th><th>Active</th><th></th></tr></thead><tbody>
+              ${set.options.map(option => `<tr data-option-id="${escapeHtml(option.id)}">
+                <td><input data-field="label" value="${escapeHtml(option.label)}" aria-label="Label"></td>
+                <td><code>${escapeHtml(option.value)}</code></td>
+                <td><input data-field="sortOrder" type="number" value="${Number(option.sortOrder)}" aria-label="Sort order"></td>
+                <td><input data-field="isActive" type="checkbox"${option.isActive ? ' checked' : ''} aria-label="Active"></td>
+                <td><button class="button button-small button-dark" type="button" data-save-option>Save</button></td>
+              </tr>`).join('')}
+              </tbody></table></div>
+              <form class="master-add" data-add-option data-set-key="${escapeHtml(set.key)}">
+                <input name="value" placeholder="${escapeHtml(set.valueLabel)}" required>
+                <input name="label" placeholder="Label" required>
+                <input name="sortOrder" type="number" placeholder="Sort" value="0">
+                <button class="button button-small button-light" type="submit">Add option</button>
+              </form>
+            </details>`).join('');
+          masterStatus.textContent = `${sets.length} managed lists.`;
+        }
+
         loginForm.addEventListener('submit', async event => {
           event.preventDefault();
           authStatus.textContent = 'Checking credentials...';
@@ -115,8 +141,7 @@
         filters.addEventListener('submit', event => {
           event.preventDefault();
           loadLeads().catch(error => { workspaceStatus.textContent = error.message; });
-        });
-        document.querySelector('[data-refresh]').addEventListener('click', () => Promise.all([loadOverview(), loadLeads()]).catch(error => { workspaceStatus.textContent = error.message; }));
+        });        document.querySelector('[data-refresh]').addEventListener('click', () => Promise.all([loadOverview(), loadLeads()]).catch(error => { workspaceStatus.textContent = error.message; }));
         rows.addEventListener('click', event => {
           const row = event.target.closest('[data-lead-id]');
           if (row) loadLead(row.dataset.leadId).catch(error => { workspaceStatus.textContent = error.message; });
@@ -165,4 +190,36 @@
         });
 
         api('/auth/session').then(showDashboard).catch(() => showSignedOut());
+
+        document.querySelector('[data-refresh-master]')?.addEventListener('click', () => loadMasterData().catch(error => { masterStatus.textContent = error.message; }));
+
+        masterSets?.addEventListener('click', async event => {
+          const saveButton = event.target.closest('[data-save-option]');
+          if (!saveButton) return;
+          const row = saveButton.closest('[data-option-id]');
+          const body = {
+            label: row.querySelector('[data-field="label"]').value,
+            sortOrder: Number(row.querySelector('[data-field="sortOrder"]').value),
+            isActive: row.querySelector('[data-field="isActive"]').checked
+          };
+          try {
+            masterStatus.textContent = 'Saving option...';
+            await api(`/admin/options/${row.dataset.optionId}`, { method: 'PATCH', body: JSON.stringify(body) });
+            await loadMasterData();
+            masterStatus.textContent = 'Option saved.';
+          } catch (error) { masterStatus.textContent = error.message; }
+        });
+
+        masterSets?.addEventListener('submit', async event => {
+          const form = event.target.closest('[data-add-option]');
+          if (!form) return;
+          event.preventDefault();
+          const values = Object.fromEntries(new FormData(form));
+          try {
+            masterStatus.textContent = 'Adding option...';
+            await api('/admin/options', { method: 'POST', body: JSON.stringify({ setKey: form.dataset.setKey, value: values.value, label: values.label, sortOrder: Number(values.sortOrder) || 0 }) });
+            await loadMasterData();
+            masterStatus.textContent = 'Option added.';
+          } catch (error) { masterStatus.textContent = error.message; }
+        });
 })();

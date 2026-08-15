@@ -6,6 +6,7 @@ import { createCustomerLocationRouter } from './customer-locations.js';
 import { createLeadRouter } from './leads.js';
 import { createMeRouter } from './me.js';
 import { deriveApproximateLocation } from '../services/location.js';
+import { getPublicOptions } from '../services/master-data.js';
 
 export function createApiRouter({ config, pool, services }) {
   const router = Router();
@@ -18,6 +19,12 @@ export function createApiRouter({ config, pool, services }) {
     } catch {
       response.status(503).json({ status: 'degraded', application: 'available', database: 'unavailable' });
     }
+  });
+
+  router.get('/v1/options', async (_request, response, next) => {
+    try {
+      response.json({ success: true, options: await getPublicOptions(pool) });
+    } catch (error) { next(error); }
   });
 
   router.get('/v1/public-config', (request, response) => response.json({
