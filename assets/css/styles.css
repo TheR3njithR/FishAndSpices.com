@@ -35,7 +35,6 @@
 
   body {
     min-width: 320px;
-    overflow-x: hidden;
     color: var(--graphite);
     background: var(--sand-50);
     font-family: var(--font-body);
@@ -79,17 +78,17 @@
 }
 
 @layer sections {
-  .site-header { position: fixed; z-index: 100; inset: 0 0 auto; height: 78px; border-bottom: 1px solid rgb(255 255 255 / .18); color: var(--white); transition: background-color .25s ease, box-shadow .25s ease; }
+  .site-header { position: fixed; z-index: 100; inset: 0 0 auto; height: 72px; border-bottom: 1px solid rgb(255 255 255 / .18); color: var(--white); transition: background-color .25s ease, box-shadow .25s ease; }
   .site-header.is-scrolled, .site-header.menu-open { color: var(--graphite); background: rgb(255 255 255 / .98); box-shadow: 0 8px 30px rgb(4 31 48 / .1); }
-  .header-inner { display: flex; width: min(100%, 1460px); height: 100%; align-items: center; gap: 22px; margin-inline: auto; padding-inline: clamp(18px, 3vw, 42px); }
+  .header-inner { display: flex; width: min(100%, 1460px); height: 100%; align-items: center; gap: 16px; margin-inline: auto; padding-inline: clamp(18px, 2.5vw, 36px); }
   .brand { display: inline-flex; flex: 0 0 auto; align-items: center; gap: 10px; text-decoration: none; }
-  .brand img { width: 43px; height: 43px; }
+  .brand img { width: 39px; height: 39px; }
   .brand-copy { display: grid; line-height: 1; }
   .brand-copy strong { font-family: var(--font-display); font-size: 1.14rem; font-weight: 700; }
   .brand-copy strong span { color: var(--coral-500); }
   .brand-copy small { margin-top: 5px; font-size: .63rem; letter-spacing: .05em; opacity: .75; }
-  .site-nav { display: flex; align-items: center; gap: clamp(13px, 1.4vw, 23px); margin-left: auto; }
-  .site-nav a { position: relative; font-size: .82rem; font-weight: 670; text-decoration: none; white-space: nowrap; }
+  .site-nav { display: flex; align-items: center; gap: clamp(12px, 1.15vw, 20px); margin-left: auto; }
+  .site-nav a { position: relative; font-size: .79rem; font-weight: 670; text-decoration: none; white-space: nowrap; }
   .site-nav a::after { position: absolute; right: 0; bottom: -7px; left: 0; height: 2px; content: ""; background: var(--coral-500); transform: scaleX(0); transform-origin: left; transition: transform .2s ease; }
   .site-nav a:hover::after { transform: scaleX(1); }
   .header-actions { display: flex; gap: 8px; }
@@ -99,12 +98,12 @@
 
   .hero { position: relative; display: grid; min-height: min(860px, 100svh); overflow: hidden; align-items: center; color: var(--white); background: var(--ocean-950); isolation: isolate; }
   .hero-media { position: absolute; z-index: -3; inset-block: 0; width: 57%; background-position: center; background-size: cover; }
-  .hero-media-sea { left: 0; background-image: url("../images/aquaculture-supply.jpg"); clip-path: polygon(0 0, 100% 0, 82% 100%, 0 100%); }
+  .hero-media-sea { left: 0; background-image: url("../images/fish-sorting.jpg"); background-position: 54% center; clip-path: polygon(0 0, 100% 0, 82% 100%, 0 100%); }
   .hero-media-spice { right: 0; background-image: url("../images/commercial-spices.jpg"); background-position: 60% center; clip-path: polygon(18% 0, 100% 0, 100% 100%, 0 100%); }
   .hero-shade { position: absolute; z-index: -2; inset: 0; background: linear-gradient(90deg, rgb(3 28 44 / .78) 0%, rgb(3 28 44 / .88) 42%, rgb(3 28 44 / .64) 70%, rgb(3 28 44 / .45) 100%); }
   .hero::after { position: absolute; z-index: -1; top: 0; bottom: 0; left: 52%; width: 2px; content: ""; background: linear-gradient(transparent 10%, var(--amber-300), transparent 90%); transform: rotate(7deg); opacity: .7; }
   .hero-content { width: min(100%, 1080px); margin-inline: auto; padding: 150px var(--gutter) 118px; text-align: center; }
-  .hero h1 { max-width: 950px; margin-inline: auto; font-size: clamp(3.5rem, 7.7vw, 7.6rem); line-height: .93; }
+  .hero h1 { max-width: 920px; margin-inline: auto; font-size: clamp(3.4rem, 6.2vw, 6.25rem); line-height: .95; }
   .hero h1 span { color: #8fe2dc; font-style: normal; }
   .hero h1 em { color: var(--amber-300); font-style: normal; }
   .hero-lead { max-width: 760px; margin: 30px auto 34px; font-size: clamp(1.04rem, 1.7vw, 1.35rem); line-height: 1.55; }
@@ -231,7 +230,7 @@
     .footer-top { grid-template-columns: 2fr repeat(3, 1fr); }
   }
 
-  @media (max-width: 940px) {
+  @media (max-width: 1100px) {
     .site-header { height: 70px; }
     .menu-toggle { display: block; margin-left: auto; }
     .site-nav { position: absolute; top: 70px; right: 0; left: 0; display: grid; max-height: 0; gap: 0; overflow: hidden; color: var(--graphite); background: var(--white); box-shadow: 0 20px 30px rgb(4 31 48 / .12); transition: max-height .3s ease; }
