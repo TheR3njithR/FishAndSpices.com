@@ -439,11 +439,11 @@ import { requestCurrentPosition } from './device-location.js';
       if (turnstileWidgetId !== null) window.turnstile.remove(turnstileWidgetId);
       turnstileWidgetId = window.turnstile.render(turnstileRoot, {
         sitekey: publicConfig.turnstileSiteKey,
-        callback: token => { turnstileToken = token; submitButton.disabled = false; submitStatus.textContent = 'Human verification complete. You can submit securely.'; },
+        callback: token => { turnstileToken = token; submitButton.disabled = false; submitStatus.textContent = 'Human verification complete. If Cloudflare shows "Success", verification is working and you can submit securely.'; },
         'expired-callback': () => { turnstileToken = ''; submitButton.disabled = true; submitStatus.textContent = 'Human verification expired. Complete it again.'; },
         'error-callback': () => { turnstileToken = ''; submitButton.disabled = true; submitStatus.textContent = 'Human verification could not load. Please retry.'; }
       });
-      submitStatus.textContent = 'Complete human verification to submit.';
+      submitStatus.textContent = 'Complete Cloudflare human verification to submit.';
     } catch {
       submitStatus.textContent = 'Secure submission is not configured in this environment. Your entered information remains in this page.';
     }
