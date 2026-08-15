@@ -5,6 +5,17 @@ const menuButton = document.querySelector('.menu-toggle');
 const navigation = document.querySelector('#site-navigation');
 
 const menuText = value => window.FS_I18N?.text(value) || value;
+const isMenuToggleVisible = () => Boolean(menuButton) && getComputedStyle(menuButton).display !== 'none';
+const setMenuOpenState = (open) => {
+  if (!menuButton || !header) return;
+  menuButton.setAttribute('aria-expanded', String(open));
+  menuButton.querySelector('.sr-only').textContent = menuText(open ? 'Close menu' : 'Open menu');
+  header.classList.toggle('menu-open', open);
+  if (navigation && isMenuToggleVisible()) {
+    navigation.style.maxHeight = open ? `${Math.max(window.innerHeight - 70, 0)}px` : '0px';
+    navigation.style.overflowY = open ? 'auto' : 'hidden';
+  }
+};
 
 if (header && !header.querySelector('[data-customer-sign-in]')) {
   const signIn = document.createElement('a');
@@ -16,17 +27,12 @@ if (header && !header.querySelector('[data-customer-sign-in]')) {
 }
 
 const closeMenu = () => {
-  if (!menuButton || !header) return;
-  menuButton.setAttribute('aria-expanded', 'false');
-  menuButton.querySelector('.sr-only').textContent = menuText('Open menu');
-  header.classList.remove('menu-open');
+  setMenuOpenState(false);
 };
 
 menuButton?.addEventListener('click', () => {
   const isOpen = menuButton.getAttribute('aria-expanded') === 'true';
-  menuButton.setAttribute('aria-expanded', String(!isOpen));
-  menuButton.querySelector('.sr-only').textContent = menuText(isOpen ? 'Open menu' : 'Close menu');
-  header.classList.toggle('menu-open', !isOpen);
+  setMenuOpenState(!isOpen);
 });
 
 navigation?.addEventListener('click', (event) => {
@@ -42,6 +48,17 @@ document.addEventListener('keydown', (event) => {
 
 if (header) {
   const updateHeader = () => header.classList.toggle('is-scrolled', document.body.classList.contains('inner-page') || window.scrollY > 24);
+  window.addEventListener('resize', () => {
+    if (!navigation || !menuButton) return;
+    const isOpen = menuButton.getAttribute('aria-expanded') === 'true';
+    if (isMenuToggleVisible()) {
+      navigation.style.maxHeight = isOpen ? `${Math.max(window.innerHeight - 70, 0)}px` : '0px';
+      navigation.style.overflowY = isOpen ? 'auto' : 'hidden';
+    } else {
+      navigation.style.removeProperty('max-height');
+      navigation.style.removeProperty('overflow-y');
+    }
+  });
   window.addEventListener('scroll', updateHeader, { passive: true });
   updateHeader();
 }
