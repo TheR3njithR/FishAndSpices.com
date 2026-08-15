@@ -242,7 +242,7 @@
     .site-header { height: 70px; }
     .menu-toggle { display: block; margin-left: auto; }
     .site-nav { position: absolute; top: 70px; right: 0; left: 0; display: grid; max-height: 0; gap: 0; overflow: hidden; color: var(--graphite); background: var(--white); box-shadow: 0 20px 30px rgb(4 31 48 / .12); transition: max-height .3s ease; }
-    .menu-open .site-nav { max-height: calc(100vh - 70px); max-height: calc(100svh - 70px); overflow-y: auto; }
+    .menu-open .site-nav { max-height: calc(100vh - 70px); overflow-y: auto; }
     .site-nav a { padding: 13px var(--gutter); border-top: 1px solid var(--line); font-size: .9rem; }
     .site-nav a::after { display: none; }
     .menu-toggle[aria-expanded="true"] span:nth-of-type(2) { transform: translateY(7px) rotate(45deg); }
@@ -276,7 +276,7 @@
     html:lang(hi) .site-nav,
     html:lang(ml) .site-nav { position: absolute; top: 70px; right: 0; left: 0; display: grid; max-height: 0; gap: 0; overflow: hidden; color: var(--graphite); background: var(--white); box-shadow: 0 20px 30px rgb(4 31 48 / .12); transition: max-height .3s ease; }
     html:lang(hi) .menu-open .site-nav,
-    html:lang(ml) .menu-open .site-nav { max-height: calc(100vh - 70px); max-height: calc(100svh - 70px); overflow-y: auto; }
+    html:lang(ml) .menu-open .site-nav { max-height: calc(100vh - 70px); overflow-y: auto; }
     html:lang(hi) .site-nav a,
     html:lang(ml) .site-nav a { padding: 13px var(--gutter); border-top: 1px solid var(--line); font-size: .9rem; white-space: normal; }
     html:lang(hi) .site-nav a::after,
