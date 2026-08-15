@@ -192,6 +192,8 @@ import { requestCurrentPosition } from './device-location.js';
   const escapeHtml = (value) => String(value).replace(/[&<>'"]/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[character]);
   const sanitize = (value) => String(value ?? '').replace(/[^\P{C}\n\t]/gu, '').replace(/[<>]/g, '').replace(/\s+/g, ' ').trim().slice(0, 1000);
   const inputId = name => `lead-${name}`;
+  const contactFallbackFields = new Set(['businessEmail', 'phone']);
+  const contactFallbackHint = 'At least one of Email or Mobile or WhatsApp is required.';
 
   const minimumFields = new Set([
     'fullName', 'countryCallingCode', 'phone', 'businessEmail', 'companyName', 'countryCode', 'country', 'state', 'district', 'locality', 'postalCode',
@@ -211,11 +213,13 @@ import { requestCurrentPosition } from './device-location.js';
   function renderField(definition) {
     if (!minimumFields.has(definition.name)) return '';
     const isRequired = requiredInitialFields.has(definition.name);
+    const isContactFallbackRequired = contactFallbackFields.has(definition.name);
     const required = isRequired ? ' required' : '';
-    const requiredMark = isRequired ? ' <span class="required-mark" aria-hidden="true">*</span>' : '';
+    const requiredMark = (isRequired || isContactFallbackRequired) ? ' <span class="required-mark" aria-hidden="true">*</span>' : '';
     const wide = definition.wide ? ' field-wide' : '';
-    const hint = definition.hint ? `<span class="field-hint" id="${inputId(definition.name)}-hint">${escapeHtml(definition.hint)}</span>` : '';
-    const describedBy = definition.hint ? ` aria-describedby="${inputId(definition.name)}-hint"` : '';
+    const hintText = definition.hint || (isContactFallbackRequired ? contactFallbackHint : '');
+    const hint = hintText ? `<span class="field-hint" id="${inputId(definition.name)}-hint">${escapeHtml(hintText)}</span>` : '';
+    const describedBy = hintText ? ` aria-describedby="${inputId(definition.name)}-hint"` : '';
     if (definition.type === 'checkbox') {
       return `<div class="field check-field${wide}"><input id="${inputId(definition.name)}" name="${definition.name}" type="checkbox"${required}><label for="${inputId(definition.name)}">${escapeHtml(definition.label)}${requiredMark}</label></div>`;
     }
@@ -343,9 +347,41 @@ import { requestCurrentPosition } from './device-location.js';
     return [...shared.flatMap(item => item.fields), ...specific.fields, ...declarations];
   }
 
-  function showErrors() {
+  function clearFieldErrors() {
     fieldsRoot.querySelectorAll('.field-error').forEach(error => error.remove());
     fieldsRoot.querySelectorAll('[aria-invalid]').forEach(control => control.removeAttribute('aria-invalid'));
+    errorsRoot.hidden = true;
+    errorsRoot.innerHTML = '';
+  }
+
+  function showFieldErrors(fieldErrors, heading = 'Review the required information') {
+    clearFieldErrors();
+    const labels = new Map(allDefinitions().map(definition => [definition.name, definition.label]));
+    const entries = Object.entries(fieldErrors || {}).filter(([, message]) => Boolean(message));
+    if (!entries.length) return;
+
+    const listItems = entries.map(([name, message]) => {
+      const control = fieldsRoot.querySelector(`[name="${name}"]`);
+      const friendlyLabel = control?.labels?.[0]?.textContent.replace('*', '').trim() || labels.get(name) || name;
+      if (control) {
+        control.setAttribute('aria-invalid', 'true');
+        const error = document.createElement('span');
+        error.className = 'field-error';
+        error.textContent = message;
+        control.closest('.field')?.append(error);
+      }
+      return control?.id
+        ? `<li><a href="#${control.id}">${escapeHtml(friendlyLabel)}</a>: ${escapeHtml(message)}</li>`
+        : `<li>${escapeHtml(friendlyLabel)}: ${escapeHtml(message)}</li>`;
+    });
+
+    errorsRoot.innerHTML = `<h2>${escapeHtml(heading)}</h2><ul>${listItems.join('')}</ul>`;
+    errorsRoot.hidden = false;
+    errorsRoot.focus();
+  }
+
+  function showErrors() {
+    clearFieldErrors();
     const phone = fieldsRoot.querySelector('[name="phone"]');
     const email = fieldsRoot.querySelector('[name="businessEmail"]');
     phone?.setCustomValidity('');
@@ -363,10 +399,10 @@ import { requestCurrentPosition } from './device-location.js';
       control.setAttribute('aria-invalid', 'true');
       const error = document.createElement('span');
       error.className = 'field-error';
-      error.textContent = control.validity.valueMissing ? 'This information is required.' : 'Enter a valid value.';
+      error.textContent = control.validationMessage || (control.validity.valueMissing ? 'This information is required.' : 'Enter a valid value.');
       control.closest('.field').append(error);
     });
-    errorsRoot.innerHTML = `<h2>Review the required information</h2><ul>${invalid.map(control => `<li><a href="#${control.id}">${escapeHtml(control.labels?.[0]?.textContent.replace('*', '').trim() || 'Required field')}</a></li>`).join('')}</ul>`;
+    errorsRoot.innerHTML = `<h2>Review the required information</h2><ul>${invalid.map(control => `<li><a href="#${control.id}">${escapeHtml(control.labels?.[0]?.textContent.replace('*', '').trim() || 'Required field')}</a>: ${escapeHtml(control.validationMessage || 'Enter a valid value.')}</li>`).join('')}</ul>`;
     errorsRoot.hidden = false;
     errorsRoot.focus();
     return false;
@@ -465,8 +501,17 @@ import { requestCurrentPosition } from './device-location.js';
     };
     try {
       const response = await fetch('/api/v1/leads', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(payload) });
-      const result = await response.json();
-      if (!response.ok || !result.success) throw new Error(result.error || 'Submission failed.');
+      let result = {};
+      try {
+        result = await response.json();
+      } catch {
+        result = {};
+      }
+      if (!response.ok || !result.success) {
+        const apiError = new Error(result.error || 'Submission failed.');
+        apiError.fields = result.fields || null;
+        throw apiError;
+      }
       referenceOutput.textContent = result.reference;
       summaryOutput.textContent = buildSummary(reviewValues, result.reference);
       whatsappLink.href = `https://wa.me/${config.whatsappNumber}?text=${encodeURIComponent(`Hello Fish & Spices. I submitted enquiry ${result.reference} and would like to follow up.`)}`;
@@ -477,6 +522,12 @@ import { requestCurrentPosition } from './device-location.js';
       submitStatus.textContent = 'Enquiry saved. No account was created for you to remember. Track it later by verifying your mobile number or email.';
     } catch (error) {
       submitStatus.textContent = error.message || 'Submission failed. Your information remains available for retry.';
+      if (error?.fields && typeof error.fields === 'object') {
+        review.hidden = true;
+        generated = false;
+        confirmButton.disabled = false;
+        showFieldErrors(error.fields, 'Review and update these fields');
+      }
       turnstileToken = '';
       submitButton.disabled = true;
       if (turnstileDevelopmentBypass) {
