@@ -1,0 +1,94 @@
+name: Promote Production
+
+on:
+  workflow_dispatch:
+    inputs:
+      git_ref:
+        description: Git ref to promote (tag, branch, or commit SHA)
+        required: true
+        default: main
+      staging_evidence:
+        description: Staging deployment id, URL, or ticket reference
+        required: true
+      confirm:
+        description: Type PROMOTE to continue
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Promote revision to Railway production
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Require explicit promotion confirmation
+        shell: bash
+        run: |
+          if [ "${{ github.event.inputs.confirm }}" != "PROMOTE" ]; then
+            echo "::error::Input 'confirm' must be exactly PROMOTE"
+            exit 1
+          fi
+
+      - name: Record staging evidence
+        run: |
+          echo "Staging evidence: ${{ github.event.inputs.staging_evidence }}"
+
+      - name: Check out source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.git_ref }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run static checks
+        run: npm run check
+
+      - name: Run test suite
+        run: npm test
+
+      - name: Audit production dependencies
+        run: npm audit --omit=dev
+
+      - name: Install Railway CLI
+        run: npm install --global @railway/cli@5.41.2
+
+      - name: Validate required secrets
+        shell: bash
+        env:
+          RAILWAY_TOKEN: ${{ secrets['RAILWAY_TOKEN'] }}
+          RAILWAY_PROJECT_ID: ${{ secrets['RAILWAY_PROJECT_ID'] }}
+          RAILWAY_PRODUCTION_SERVICE: ${{ secrets['RAILWAY_PRODUCTION_SERVICE'] }}
+          RAILWAY_PRODUCTION_ENVIRONMENT: ${{ secrets['RAILWAY_PRODUCTION_ENVIRONMENT'] }}
+        run: |
+          for key in RAILWAY_TOKEN RAILWAY_PROJECT_ID RAILWAY_PRODUCTION_SERVICE RAILWAY_PRODUCTION_ENVIRONMENT; do
+            if [ -z "${!key}" ]; then
+              echo "::error::Missing required secret: ${key}"
+              exit 1
+            fi
+          done
+
+      - name: Deploy production revision
+        env:
+          RAILWAY_TOKEN: ${{ secrets['RAILWAY_TOKEN'] }}
+          RAILWAY_PROJECT_ID: ${{ secrets['RAILWAY_PROJECT_ID'] }}
+          RAILWAY_PRODUCTION_SERVICE: ${{ secrets['RAILWAY_PRODUCTION_SERVICE'] }}
+          RAILWAY_PRODUCTION_ENVIRONMENT: ${{ secrets['RAILWAY_PRODUCTION_ENVIRONMENT'] }}
+        run: |
+          railway up --ci --detach \
+            --project "$RAILWAY_PROJECT_ID" \
+            --service "$RAILWAY_PRODUCTION_SERVICE" \
+            --environment "$RAILWAY_PRODUCTION_ENVIRONMENT" \
+            --message "github:${GITHUB_SHA}"

@@ -13,6 +13,25 @@ Deploy to staging, verify there, and only then promote the same reviewed revisio
 
 Never set `TURNSTILE_DEV_BYPASS` in staging or production. Do not print or commit secret values.
 
+## GitHub Actions CI/CD
+
+Workflows live in `.github/workflows/`:
+
+- `ci.yml` runs on pull requests and pushes to `main` and `release/**`, executing `npm ci`, `npm run check`, `npm test`, and `npm audit --omit=dev`.
+- `deploy-staging.yml` deploys to Railway staging after a successful push CI run on `main` or `release/**` (and can also be triggered manually).
+- `promote-production.yml` is manual-only and requires an explicit `PROMOTE` confirmation plus staging evidence before deploying to production.
+
+Set these GitHub repository secrets before enabling deployment workflows:
+
+- `RAILWAY_TOKEN`
+- `RAILWAY_PROJECT_ID`
+- `RAILWAY_STAGING_SERVICE`
+- `RAILWAY_STAGING_ENVIRONMENT`
+- `RAILWAY_PRODUCTION_SERVICE`
+- `RAILWAY_PRODUCTION_ENVIRONMENT`
+
+If GitHub Environments are used, map the staging and production secrets to the corresponding environment scopes.
+
 ## Staging release
 
 1. Create a Railway staging environment from the existing project without replacing production services.

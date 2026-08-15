@@ -242,7 +242,7 @@
     .site-header { height: 70px; }
     .menu-toggle { display: block; margin-left: auto; }
     .site-nav { position: absolute; top: 70px; right: 0; left: 0; display: grid; max-height: 0; gap: 0; overflow: hidden; color: var(--graphite); background: var(--white); box-shadow: 0 20px 30px rgb(4 31 48 / .12); transition: max-height .3s ease; }
-    .menu-open .site-nav { max-height: 650px; }
+    .menu-open .site-nav { max-height: calc(100svh - 70px); overflow-y: auto; }
     .site-nav a { padding: 13px var(--gutter); border-top: 1px solid var(--line); font-size: .9rem; }
     .site-nav a::after { display: none; }
     .menu-toggle[aria-expanded="true"] span:nth-of-type(2) { transform: translateY(7px) rotate(45deg); }
@@ -262,6 +262,31 @@
     .market-visual { width: min(100%, 600px); margin-inline: auto; aspect-ratio: 16 / 10; }
     .market-copy { max-width: none; }
     .footer-top { grid-template-columns: 2fr repeat(2, 1fr); }
+  }
+
+  @media (max-width: 1300px) and (min-width: 1101px) {
+    html:lang(hi) .site-header,
+    html:lang(ml) .site-header { height: 70px; }
+    html:lang(hi) .header-actions,
+    html:lang(ml) .header-actions,
+    html:lang(hi) .customer-sign-in,
+    html:lang(ml) .customer-sign-in { display: none; }
+    html:lang(hi) .menu-toggle,
+    html:lang(ml) .menu-toggle { display: block; margin-left: auto; }
+    html:lang(hi) .site-nav,
+    html:lang(ml) .site-nav { position: absolute; top: 70px; right: 0; left: 0; display: grid; max-height: 0; gap: 0; overflow: hidden; color: var(--graphite); background: var(--white); box-shadow: 0 20px 30px rgb(4 31 48 / .12); transition: max-height .3s ease; }
+    html:lang(hi) .menu-open .site-nav,
+    html:lang(ml) .menu-open .site-nav { max-height: calc(100svh - 70px); overflow-y: auto; }
+    html:lang(hi) .site-nav a,
+    html:lang(ml) .site-nav a { padding: 13px var(--gutter); border-top: 1px solid var(--line); font-size: .9rem; white-space: normal; }
+    html:lang(hi) .site-nav a::after,
+    html:lang(ml) .site-nav a::after { display: none; }
+    html:lang(hi) .language-control,
+    html:lang(ml) .language-control { gap: 2px; padding-inline: 5px 3px; }
+    html:lang(hi) .language-control > span,
+    html:lang(ml) .language-control > span { display: none; }
+    html:lang(hi) .language-control select,
+    html:lang(ml) .language-control select { width: 72px; font-size: .7rem; }
   }
 
   @media (max-width: 700px) {
