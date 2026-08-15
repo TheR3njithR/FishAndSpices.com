@@ -10,7 +10,7 @@ The application is operational on Railway staging and has meaningful automated a
 
 - Railway staging baseline deployment `3685a14d-bbd1-4a4c-8d04-17d4aa6aba51` completed successfully before the release candidate was committed.
 - Migrations `001`, `002` and `003` are applied in staging and protected by stored SHA-256 checksums.
-- `npm test` passes 113 tests across 14 test files.
+- `npm test` passes 127 tests across 15 test files.
 - `npm run check` resolves all local HTML assets and syntax-checks JavaScript.
 - Editor diagnostics reported no errors at the assessment date.
 - `npm audit --omit=dev` reported zero known production dependency vulnerabilities.
@@ -30,7 +30,7 @@ The application is operational on Railway staging and has meaningful automated a
 | Production secrets | **Unverified** | Generate unique production `SESSION_SECRET`, `OTP_SECRET`, Turnstile keys and provider credentials; record owner, rotation and recovery without recording values |
 | Customer OTP delivery | **Unverified/incomplete** | Select and test approved email/mobile providers, sender identity, bounce/failure handling and anti-abuse behavior; mobile delivery is not currently implemented |
 | Administrator access | **Needs review** | Confirm named accounts, strong unique passwords, role matrix, offboarding, emergency access and whether MFA or an identity-aware access layer is required |
-| Authorization model | **Needs review** | Confirm whether `reviewer` should be able to mutate leads, matches and risk events; test every admin/customer endpoint for IDOR and privilege escalation |
+| Authorization model | **Hardened; pending external retest**: `reviewer` is read-only and all administrator mutations require the `administrator`/`super_admin` roles | Independent IDOR/BOLA and privilege-escalation testing across every admin/customer endpoint |
 | CSP hardening | **Needs work**: live CSP permits `'unsafe-inline'` for scripts and styles | Remove inline script/style dependencies where practical and adopt nonces or hashes; retest Turnstile and all pages |
 | Backup and restore | **Unverified** | Record backup schedule/retention and complete a restore into an isolated database with row-count and integrity checks |
 | Monitoring and alerting | **Unverified** | Define alerts for 5xx, auth abuse, OTP abuse, migration failures, database saturation and notification failures; verify log retention and access |

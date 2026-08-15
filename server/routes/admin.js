@@ -16,6 +16,37 @@ const columnNames = {
 };
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
+const WRITE_ROLES = ['administrator', 'super_admin'];
+
+const VERIFICATION_BASE = ['Unchecked', 'Pending', 'Confirmed', 'Failed'];
+const VERIFICATION_WITH_NA = [...VERIFICATION_BASE, 'Not applicable'];
+const verificationFields = {
+  identityStatus: VERIFICATION_BASE,
+  organisationRegistrationStatus: VERIFICATION_BASE,
+  gstStatus: VERIFICATION_WITH_NA,
+  licenceStatus: VERIFICATION_WITH_NA,
+  certificationStatus: VERIFICATION_WITH_NA,
+  productEvidenceStatus: VERIFICATION_BASE,
+  facilityEvidenceStatus: VERIFICATION_WITH_NA,
+  laboratoryEvidenceStatus: VERIFICATION_WITH_NA,
+  bankInformationStatus: VERIFICATION_BASE,
+  overallOutcome: ['Pending', 'In review', 'Verified', 'Rejected']
+};
+const CONTACT_METHODS = ['Email', 'Telephone', 'WhatsApp', 'Video call', 'In person', 'Message', 'Other'];
+const MATCH_STATUS = ['Proposed', 'Reviewing', 'Consented', 'Introduced', 'Declined', 'Closed'];
+
+function badRequest(message) {
+  const error = new Error(message);
+  error.status = 422;
+  return error;
+}
+
+function requireRole(allowed) {
+  return (request, response, next) => allowed.includes(request.adminSession.user.role)
+    ? next()
+    : response.status(403).json({ success: false, error: 'Insufficient administrator role.' });
+}
+
 function requireUuid(value, label = 'identifier') {
   if (!uuid.test(String(value))) {
     const error = new Error(`Invalid ${label}.`);
@@ -23,6 +54,54 @@ function requireUuid(value, label = 'identifier') {
     throw error;
   }
 }
+
+function optionalText(value, limit, label) {
+  if (value === undefined || value === null || value === '') return null;
+  if (typeof value !== 'string') throw badRequest(`Invalid ${label}.`);
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+  if (trimmed.length > limit) throw badRequest(`${label} is too long.`);
+  return trimmed;
+}
+
+function requiredText(value, limit, label) {
+  const result = optionalText(value, limit, label);
+  if (!result) throw badRequest(`${label} is required.`);
+  return result;
+}
+
+function optionalDate(value, label) {
+  if (value === undefined || value === null || value === '') return null;
+  if (typeof value !== 'string' || Number.isNaN(Date.parse(value))) throw badRequest(`Invalid ${label}.`);
+  return value;
+}
+
+function optionalAmount(value, label) {
+  if (value === undefined || value === null || value === '') return null;
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric) || numeric < 0) throw badRequest(`Invalid ${label}.`);
+  return numeric;
+}
+
+function booleanFlag(value, label) {
+  if (typeof value !== 'boolean') throw badRequest(`Invalid ${label}.`);
+  return value;
+}
+
+const matchValidators = {
+  status: value => { if (!MATCH_STATUS.includes(value)) throw badRequest('Invalid status.'); return value; },
+  buyerConsent: value => booleanFlag(value, 'buyer consent'),
+  sellerConsent: value => booleanFlag(value, 'seller consent'),
+  introductionDate: value => optionalDate(value, 'introduction date'),
+  quotationStatus: value => optionalText(value, 500, 'quotation status'),
+  sampleStatus: value => optionalText(value, 500, 'sample status'),
+  inspectionStatus: value => optionalText(value, 500, 'inspection status'),
+  negotiationStatus: value => optionalText(value, 500, 'negotiation status'),
+  transactionStatus: value => optionalText(value, 500, 'transaction status'),
+  estimatedValue: value => optionalAmount(value, 'estimated value'),
+  platformRevenue: value => optionalAmount(value, 'platform revenue'),
+  outcome: value => optionalText(value, 2000, 'outcome')
+};
 
 export function createAdminRouter({ config, pool }) {
   const router = Router();
@@ -60,7 +139,7 @@ export function createAdminRouter({ config, pool }) {
     } catch (error) { next(error); }
   });
 
-  router.patch('/location-risk-events/:id', requireCsrf, async (request, response, next) => {
+  router.patch('/location-risk-events/:id', requireRole(WRITE_ROLES), requireCsrf, async (request, response, next) => {
     try {
       requireUuid(request.params.id, 'risk-event identifier');
       if (!['dismissed', 'resolved'].includes(request.body.status) || !String(request.body.notes || '').trim()) {
@@ -137,7 +216,7 @@ export function createAdminRouter({ config, pool }) {
     } catch (error) { next(error); }
   });
 
-  router.patch('/leads/:id', requireCsrf, async (request, response, next) => {
+  router.patch('/leads/:id', requireRole(WRITE_ROLES), requireCsrf, async (request, response, next) => {
     try {
       requireUuid(request.params.id, 'lead identifier');
       const updates = [];
@@ -168,13 +247,18 @@ export function createAdminRouter({ config, pool }) {
     } catch (error) { next(error); }
   });
 
-  router.post('/leads/:id/interactions', requireCsrf, async (request, response, next) => {
+  router.post('/leads/:id/interactions', requireRole(WRITE_ROLES), requireCsrf, async (request, response, next) => {
     try {
       requireUuid(request.params.id, 'lead identifier');
-      if (!['Inbound', 'Outbound'].includes(request.body.direction) || !request.body.contactMethod || !request.body.summary) return response.status(422).json({ success: false, error: 'Contact method, direction and summary are required.' });
+      if (!['Inbound', 'Outbound'].includes(request.body.direction)) throw badRequest('A valid direction is required.');
+      if (!CONTACT_METHODS.includes(request.body.contactMethod)) throw badRequest('A valid contact method is required.');
+      const summary = requiredText(request.body.summary, 2000, 'Summary');
+      const outcome = optionalText(request.body.outcome, 2000, 'Outcome');
+      const nextAction = optionalText(request.body.nextAction, 2000, 'Next action');
+      const followUpDate = optionalDate(request.body.followUpDate, 'follow-up date');
       const result = await withTransaction(pool, async client => {
         const inserted = await client.query(`insert into lead_interactions (lead_id, contact_method, direction, summary, outcome, next_action, follow_up_date, administrator_id)
-          values ($1,$2,$3,$4,$5,$6,$7,$8) returning *`, [request.params.id, request.body.contactMethod, request.body.direction, request.body.summary, request.body.outcome || null, request.body.nextAction || null, request.body.followUpDate || null, request.adminSession.user.id]);
+          values ($1,$2,$3,$4,$5,$6,$7,$8) returning *`, [request.params.id, request.body.contactMethod, request.body.direction, summary, outcome, nextAction, followUpDate, request.adminSession.user.id]);
         await writeAudit(client, { administratorId: request.adminSession.user.id, action: 'interaction_recorded', entityType: 'lead', entityIdentifier: request.params.id, newValues: inserted.rows[0] });
         return inserted.rows[0];
       });
@@ -182,17 +266,20 @@ export function createAdminRouter({ config, pool }) {
     } catch (error) { next(error); }
   });
 
-  router.post('/leads/:id/verification', requireCsrf, async (request, response, next) => {
+  router.post('/leads/:id/verification', requireRole(WRITE_ROLES), requireCsrf, async (request, response, next) => {
     try {
       requireUuid(request.params.id, 'lead identifier');
-      const fields = ['identityStatus','organisationRegistrationStatus','gstStatus','licenceStatus','certificationStatus','productEvidenceStatus','facilityEvidenceStatus','laboratoryEvidenceStatus','bankInformationStatus','overallOutcome'];
-      if (fields.some(field => !request.body[field])) return response.status(422).json({ success: false, error: 'All verification statuses are required.' });
+      const fields = Object.keys(verificationFields);
+      for (const [field, allowed] of Object.entries(verificationFields)) {
+        if (!allowed.includes(request.body[field])) throw badRequest(`Invalid ${field}.`);
+      }
+      const notes = optionalText(request.body.notes, 2000, 'Notes');
       const inserted = await withTransaction(pool, async client => {
         const result = await client.query(`insert into verification_checks (
           lead_id, identity_status, organisation_registration_status, gst_status, licence_status, certification_status,
           product_evidence_status, facility_evidence_status, laboratory_evidence_status, bank_information_status,
           overall_outcome, notes, administrator_id
-        ) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13) returning *`, [request.params.id, ...fields.slice(0, 10).map(field => request.body[field]), request.body.notes || null, request.adminSession.user.id]);
+        ) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13) returning *`, [request.params.id, ...fields.map(field => request.body[field]), notes, request.adminSession.user.id]);
         await client.query('update leads set verification_status=$1 where id=$2', [request.body.overallOutcome, request.params.id]);
         await writeAudit(client, { administratorId: request.adminSession.user.id, action: 'verification_recorded', entityType: 'lead', entityIdentifier: request.params.id, newValues: result.rows[0] });
         return result.rows[0];
@@ -206,12 +293,15 @@ export function createAdminRouter({ config, pool }) {
     catch (error) { next(error); }
   });
 
-  router.post('/matches', requireCsrf, async (request, response, next) => {
+  router.post('/matches', requireRole(WRITE_ROLES), requireCsrf, async (request, response, next) => {
     try {
       requireUuid(request.body.buyerLeadId, 'buyer lead identifier'); requireUuid(request.body.sellerLeadId, 'seller lead identifier');
+      const score = Number(request.body.score);
+      if (!Number.isFinite(score) || score < 0 || score > 100) throw badRequest('Score must be a number between 0 and 100.');
+      const explanation = requiredText(request.body.explanation, 4000, 'Explanation');
       const match = await withTransaction(pool, async client => {
         const result = await client.query(`insert into matches (buyer_lead_id, seller_lead_id, match_score, match_explanation, created_by)
-          values ($1,$2,$3,$4,$5) returning *`, [request.body.buyerLeadId, request.body.sellerLeadId, request.body.score, request.body.explanation, request.adminSession.user.id]);
+          values ($1,$2,$3,$4,$5) returning *`, [request.body.buyerLeadId, request.body.sellerLeadId, score, JSON.stringify({ summary: explanation }), request.adminSession.user.id]);
         await client.query(`update leads set match_status='Potential match' where id in ($1,$2)`, [request.body.buyerLeadId, request.body.sellerLeadId]);
         await writeAudit(client, { administratorId: request.adminSession.user.id, action: 'match_proposed', entityType: 'match', entityIdentifier: result.rows[0].id, newValues: result.rows[0] });
         return result.rows[0];
@@ -220,15 +310,15 @@ export function createAdminRouter({ config, pool }) {
     } catch (error) { next(error); }
   });
 
-  router.patch('/matches/:id', requireCsrf, async (request, response, next) => {
+  router.patch('/matches/:id', requireRole(WRITE_ROLES), requireCsrf, async (request, response, next) => {
     try {
       requireUuid(request.params.id, 'match identifier');
-      const allowed = ['status','buyerConsent','sellerConsent','introductionDate','quotationStatus','sampleStatus','inspectionStatus','negotiationStatus','transactionStatus','estimatedValue','platformRevenue','outcome'];
-      if (Object.keys(request.body).some(key => !allowed.includes(key))) return response.status(422).json({ success: false, error: 'Unsupported match field.' });
+      const keys = Object.keys(request.body);
+      if (keys.some(key => !matchValidators[key])) throw badRequest('Unsupported match field.');
+      if (!keys.length) throw badRequest('No changes provided.');
       const columns = { buyerConsent:'buyer_consent',sellerConsent:'seller_consent',introductionDate:'introduction_date',quotationStatus:'quotation_status',sampleStatus:'sample_status',inspectionStatus:'inspection_status',negotiationStatus:'negotiation_status',transactionStatus:'transaction_status',estimatedValue:'estimated_value',platformRevenue:'platform_revenue' };
       const values=[]; const updates=[];
-      for (const [key,value] of Object.entries(request.body)) { values.push(value); updates.push(`${columns[key] || key}=$${values.length}`); }
-      if (!updates.length) return response.status(422).json({ success: false, error: 'No changes provided.' });
+      for (const key of keys) { values.push(matchValidators[key](request.body[key])); updates.push(`${columns[key] || key}=$${values.length}`); }
       const match = await withTransaction(pool, async client => {
         const previous=await client.query('select * from matches where id=$1 for update',[request.params.id]);
         if(!previous.rowCount)return null; values.push(request.params.id);
