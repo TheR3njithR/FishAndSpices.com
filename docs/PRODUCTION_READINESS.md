@@ -9,6 +9,7 @@ The application is operational on Railway staging and has meaningful automated a
 ## Current verified baseline
 
 - Railway staging baseline deployment `3685a14d-bbd1-4a4c-8d04-17d4aa6aba51` completed successfully before the release candidate was committed.
+- The release candidate is committed and tagged (`v3.0.0-rc.3`) and builds from a pinned `Dockerfile` (`builder = "DOCKERFILE"`); staging deployment `29775be6-9e55-45e0-b4c2-8f29e3144f4f` from that build is healthy.
 - Migrations `001`, `002` and `003` are applied in staging and protected by stored SHA-256 checksums.
 - `npm test` passes 127 tests across 15 test files.
 - `npm run check` resolves all local HTML assets and syntax-checks JavaScript.
@@ -24,7 +25,7 @@ The application is operational on Railway staging and has meaningful automated a
 
 | Gate | Current state | Required evidence |
 | --- | --- | --- |
-| Reproducible source revision | **Blocked**: most application files are uncommitted while `HEAD` is the older Phase 2 revision | Review changes, remove accidental files, commit a release candidate, tag it, and deploy that exact revision |
+| Reproducible source revision | **Addressed; pending prod pipeline**: committed and tagged `v3.0.0-rc.3`, built from a pinned `Dockerfile` so all build paths produce the same Node runtime | Deploy only reviewed, tagged revisions; confirm the Railway service builder is Dockerfile for dashboard-triggered rebuilds |
 | Independent security review | **Blocked** | White-box review, authenticated API test and external staging penetration test against the release candidate; remediate and retest High/Critical findings |
 | Production domain and request path | **Blocked**: staging is Railway Hikari; the current public domain was not verified as the same path | Document DNS/TLS/proxy chain, trusted proxy count, origin, header stripping and final hostname before changing DNS |
 | Production secrets | **Unverified** | Generate unique production `SESSION_SECRET`, `OTP_SECRET`, Turnstile keys and provider credentials; record owner, rotation and recovery without recording values |
