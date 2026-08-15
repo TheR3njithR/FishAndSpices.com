@@ -264,7 +264,7 @@
     .footer-top { grid-template-columns: 2fr repeat(2, 1fr); }
   }
 
-  @media (max-width: 1300px) and (min-width: 1101px) {
+  @media (max-width: 1500px) and (min-width: 1101px) {
     html:lang(hi) .site-header,
     html:lang(ml) .site-header { height: 70px; }
     html:lang(hi) .header-actions,
