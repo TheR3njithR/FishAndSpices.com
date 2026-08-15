@@ -41,6 +41,7 @@ describe('public options endpoint', () => {
       { set_key: 'incoterms', value: 'FOB', label: 'FOB' }
     ] }) });
     const response = await request(app).get('/api/v1/options').expect(200);
+    expect(response.headers['cache-control']).toBe('no-store');
     expect(response.body.options.countries).toEqual([{ value: 'IN', label: 'India' }]);
     expect(response.body.options.incoterms).toEqual([{ value: 'FOB', label: 'FOB' }]);
   });

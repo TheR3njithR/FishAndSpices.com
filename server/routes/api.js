@@ -23,6 +23,7 @@ export function createApiRouter({ config, pool, services }) {
 
   router.get('/v1/options', async (_request, response, next) => {
     try {
+      response.set('Cache-Control', 'no-store');
       response.json({ success: true, options: await getPublicOptions(pool) });
     } catch (error) { next(error); }
   });

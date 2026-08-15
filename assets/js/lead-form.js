@@ -49,7 +49,7 @@ import { requestCurrentPosition } from './device-location.js';
 
   async function loadManagedOptions() {
     try {
-      const response = await fetch('/api/v1/options', { headers: { accept: 'application/json' } });
+      const response = await fetch('/api/v1/options', { headers: { accept: 'application/json' }, cache: 'no-store' });
       if (!response.ok) return;
       const { options } = await response.json();
       const apply = (target, key) => {
