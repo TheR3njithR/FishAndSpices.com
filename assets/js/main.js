@@ -3,31 +3,44 @@ const menuButton = document.querySelector('.menu-toggle');
 const navigation = document.querySelector('#site-navigation');
 
 const closeMenu = () => {
+  if (!menuButton || !header) return;
   menuButton.setAttribute('aria-expanded', 'false');
   menuButton.querySelector('.sr-only').textContent = 'Open menu';
   header.classList.remove('menu-open');
 };
 
-menuButton.addEventListener('click', () => {
+menuButton?.addEventListener('click', () => {
   const isOpen = menuButton.getAttribute('aria-expanded') === 'true';
   menuButton.setAttribute('aria-expanded', String(!isOpen));
   menuButton.querySelector('.sr-only').textContent = isOpen ? 'Open menu' : 'Close menu';
   header.classList.toggle('menu-open', !isOpen);
 });
 
-navigation.addEventListener('click', (event) => {
+navigation?.addEventListener('click', (event) => {
   if (event.target.closest('a')) closeMenu();
 });
 
 document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape') {
     closeMenu();
-    menuButton.focus();
+    menuButton?.focus();
   }
 });
 
-const updateHeader = () => header.classList.toggle('is-scrolled', window.scrollY > 24);
-window.addEventListener('scroll', updateHeader, { passive: true });
-updateHeader();
+if (header) {
+  const updateHeader = () => header.classList.toggle('is-scrolled', document.body.classList.contains('inner-page') || window.scrollY > 24);
+  window.addEventListener('scroll', updateHeader, { passive: true });
+  updateHeader();
+}
 
-document.querySelector('[data-year]').textContent = new Date().getFullYear();
+document.querySelectorAll('[data-year]').forEach(year => { year.textContent = new Date().getFullYear(); });
+
+if (window.FS_CONFIG) {
+  document.querySelectorAll('[data-contact-whatsapp]').forEach(link => {
+    link.href = `https://wa.me/${window.FS_CONFIG.whatsappNumber}`;
+  });
+  document.querySelectorAll('[data-contact-email]').forEach(link => {
+    const subject = link.dataset.contactSubject ? `?subject=${encodeURIComponent(link.dataset.contactSubject)}` : '';
+    link.href = `mailto:${window.FS_CONFIG.businessEmail}${subject}`;
+  });
+}
