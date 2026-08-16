@@ -129,6 +129,7 @@ function buildSystemInstruction({ locale, allowWriteTools }) {
     allowWriteTools
       ? 'Authenticated write tools are enabled for this turn. Confirm user intent before any write action.'
       : 'Write tools are unavailable in this turn. Provide read-only guidance and ask the user to authenticate with CSRF-enabled session for actions.',
+    'Do not claim that you can create, publish, edit, cancel, or remove seller listings or buyer requirements unless a visible tool has returned a confirmed result. Until those tools exist, guide the user to the existing buy or sell form.',
     'Never claim an action is completed unless a tool call result confirms success.'
   ].join(' ');
 }
