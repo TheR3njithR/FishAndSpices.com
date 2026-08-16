@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import multer from 'multer';
 import { customerSessionCookieName } from '../customer-auth-middleware.js';
 import { resolveCustomerSession, verifyCustomerCsrf } from '../services/customer-auth.js';
 import { consumeRateLimit } from '../services/rate-limit.js';
@@ -13,7 +14,8 @@ import {
 import {
   createModelResponse,
   createRealtimeClientSecret,
-  synthesizeSpeechAudio
+  synthesizeSpeechAudio,
+  transcribeSpeechAudio
 } from '../services/ai/openai-client.js';
 import {
   buildAssistantToolDefinitions,
@@ -148,6 +150,7 @@ function validateConversationId(conversationId) {
 
 export function createAiAssistantRouter({ config, pool, services = {} }) {
   const router = Router();
+  const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 8 * 1024 * 1024, files: 1 } });
 
   const runAssistantTurn = services.runAssistantTurn || (async ({
     actor,
@@ -454,6 +457,33 @@ export function createAiAssistantRouter({ config, pool, services = {} }) {
     } catch (error) {
       next(error);
     }
+  });
+
+  router.post('/voice/transcribe', upload.single('audio'), async (request, response, next) => {
+    try {
+      if (!config.aiAssistantEnabled || !config.aiVoiceEnabled || config.aiAssistantDefaultMode === 'maintenance') {
+        return response.status(503).json({ success: false, error: 'Voice transcription is unavailable.' });
+      }
+      if (!config.openaiApiKey || !request.file?.buffer?.length) {
+        return response.status(422).json({ success: false, error: 'Provide a short audio recording.' });
+      }
+      const actor = await resolveActor({ request, pool, config });
+      const anonymousToken = actor.kind === 'anonymous' ? (request.cookies[aiAnonCookieName(config)] || randomToken(24)) : null;
+      if (actor.kind === 'anonymous' && !request.cookies[aiAnonCookieName(config)]) response.cookie(aiAnonCookieName(config), anonymousToken, aiAnonCookieOptions(config));
+      const anonymousTokenHash = anonymousToken ? keyedHash(anonymousToken, config.sessionSecret) : null;
+      const safetyIdentifier = buildSafetyIdentifier({ actor, anonymousTokenHash, config });
+      await enforceRateLimit({
+        pool, config, scope: 'ai_voice_transcription',
+        identifier: actor.userId ? `user:${actor.userId}` : `${request.ip || 'unknown'}:${anonymousTokenHash || 'anon'}`
+      });
+      const locale = normalizeText(request.body?.locale, { max: 5 }) || null;
+      const text = await transcribeSpeechAudio({
+        apiKey: config.openaiApiKey, model: config.aiSttModel, buffer: request.file.buffer,
+        mimeType: request.file.mimetype, language: locale, safetyIdentifier
+      });
+      if (!text) return response.status(422).json({ success: false, error: 'No speech was detected. Please try again.' });
+      response.json({ success: true, transcript: text });
+    } catch (error) { next(error); }
   });
 
   return router;

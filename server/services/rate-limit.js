@@ -5,7 +5,15 @@ const policies = {
   admin_login: { limit: 8, windowMs: 15 * 60_000 },
   ai_chat_anon: { limit: 20, windowMs: 60_000 },
   ai_chat_auth: { limit: 60, windowMs: 60_000 },
-  ai_realtime_session: { limit: 10, windowMs: 5 * 60_000 }
+  ai_voice_transcription: { limit: 12, windowMs: 5 * 60_000 },
+  ai_realtime_session: { limit: 10, windowMs: 5 * 60_000 },
+  partner_application: { limit: 6, windowMs: 60 * 60_000 },
+  partner_referral_capture: { limit: 90, windowMs: 60_000 },
+  partner_campaign_create: { limit: 30, windowMs: 60_000 },
+  partner_payout_request: { limit: 6, windowMs: 24 * 60 * 60_000 },
+  marketing_ai_manual_run: { limit: 6, windowMs: 10 * 60_000 },
+  marketing_ai_approval_action: { limit: 30, windowMs: 60_000 },
+  marketing_ai_scheduler: { limit: 240, windowMs: 60 * 60_000 }
 };
 
 export async function consumeRateLimit(pool, scope, identifier, config, now = new Date()) {

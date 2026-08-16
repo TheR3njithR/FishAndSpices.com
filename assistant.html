@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FishAndSpices Assistant</title>
+  <meta name="description" content="Talk or type to FishAndSpices for marketplace guidance, listings and requirements.">
+  <link rel="stylesheet" href="assets/css/styles.css?v=9"><link rel="stylesheet" href="assets/css/pages.css?v=4"><link rel="stylesheet" href="assets/css/assistant.css?v=1">
+  <script src="assets/js/config.js" defer></script><script src="assets/js/main.js?v=4" defer></script><script type="module" src="assets/js/assistant.js?v=1"></script>
+</head>
+<body class="inner-page assistant-page">
+  <header class="site-header is-scrolled"><div class="header-inner"><a class="brand" href="index.html" aria-label="Fish and Spices home"><img src="assets/brand/logo-mark.svg" width="46" height="46" alt=""><span class="brand-copy"><strong>Fish <span>&amp;</span> Spices</strong><small>Commercial supply network</small></span></a><nav class="site-nav" aria-label="Primary navigation"><a href="buy.html">Buy</a><a href="sell.html">Sell</a><a href="buy.html">Requirements</a><a href="account.html">Sign in</a></nav></div></header>
+  <main class="assistant-main" data-assistant>
+    <section class="assistant-shell" aria-labelledby="assistant-title">
+      <header class="assistant-header"><div><p class="eyebrow">Marketplace guide</p><h1 id="assistant-title">FishAndSpices Assistant</h1><p>Tell me what you want to buy or sell. You can type or use the microphone.</p></div><span class="assistant-mode" data-mode>Text ready</span></header>
+      <div class="assistant-transcript" data-transcript aria-live="polite" aria-label="Conversation transcript">
+        <article class="assistant-message assistant-message-ai"><strong>FishAndSpices Assistant</strong><p>Hi. I can help you find products, buyers, sellers, and explain the marketplace. Tell me what you need.</p></article>
+      </div>
+      <p class="assistant-status" data-status role="status">Type a message or use push-to-talk.</p>
+      <form class="assistant-composer" data-composer><textarea data-input rows="1" maxlength="2000" placeholder="I have 80 kg Varal ready next week..." aria-label="Message FishAndSpices Assistant"></textarea><button type="button" class="assistant-icon-button" data-mic aria-label="Start voice input" title="Start voice input">Mic</button><button type="submit" class="button button-coral" data-send>Send</button></form>
+      <div class="assistant-voice-actions" data-voice-actions hidden><button type="button" class="button button-light" data-stop-recording>Stop recording</button><button type="button" class="button button-light" data-cancel-recording>Cancel</button><button type="button" class="button button-light" data-stop-audio hidden>Stop audio</button></div>
+      <p class="assistant-privacy">Audio is transcribed for this conversation and not retained as a recording.</p>
+    </section>
+  </main>
+</body>
+</html>

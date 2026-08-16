@@ -11,6 +11,26 @@
 .admin-heading { display: flex; gap: 24px; align-items: end; justify-content: space-between; margin-bottom: 36px; }
 .admin-heading h1 { font-size: clamp(2.3rem, 5vw, 4.4rem); }
 .admin-heading > p { color: var(--muted); overflow-wrap: anywhere; }
+.admin-module-nav {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	margin: -10px 0 18px;
+}
+.admin-module-nav a {
+	display: inline-flex;
+	align-items: center;
+	min-height: 36px;
+	padding: 0 12px;
+	border: 1px solid var(--line);
+	border-radius: 999px;
+	text-decoration: none;
+	color: var(--ink);
+	background: var(--white);
+	font-size: .82rem;
+	font-weight: 650;
+}
+.admin-module-nav a:hover { border-color: var(--teal-500); color: var(--teal-700); }
 .admin-queues { display: grid; grid-template-columns: repeat(6, 1fr); border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
 .admin-queues article { min-height: 118px; padding: 18px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); background: var(--white); }
 .admin-queues span { color: var(--teal-700); font-size: .72rem; font-weight: 800; text-transform: uppercase; }

@@ -25,22 +25,25 @@ async function parseApiError(response) {
   }
 }
 
-export async function createModelResponse({ apiKey, model, input, tools = [], toolChoice = 'auto', safetyIdentifier = null, metadata = null }) {
+export async function createModelResponse({ apiKey, model, input, tools = [], toolChoice = 'auto', safetyIdentifier = null, metadata = null, signal = null, responseFormat = null }) {
   if (!apiKey) throw requestError('AI service is not configured.', 503);
+  const payload = {
+    model,
+    input,
+    tools,
+    tool_choice: toolChoice,
+    metadata: metadata || undefined,
+    temperature: 0.2
+  };
+  if (responseFormat) payload.text = { format: responseFormat };
   const response = await fetch(`${OPENAI_API_BASE}/responses`, {
     method: 'POST',
     headers: {
       ...buildHeaders(apiKey, safetyIdentifier),
       'content-type': 'application/json'
     },
-    body: JSON.stringify({
-      model,
-      input,
-      tools,
-      tool_choice: toolChoice,
-      metadata: metadata || undefined,
-      temperature: 0.2
-    })
+    signal: signal || undefined,
+    body: JSON.stringify(payload)
   });
   if (!response.ok) throw requestError(await parseApiError(response), response.status);
   return response.json();
@@ -79,4 +82,20 @@ export async function synthesizeSpeechAudio({ apiKey, model, voice, input, instr
   if (!response.ok) throw requestError(await parseApiError(response), response.status);
   const buffer = Buffer.from(await response.arrayBuffer());
   return { buffer, responseFormat };
+}
+
+export async function transcribeSpeechAudio({ apiKey, model, buffer, mimeType, language = null, safetyIdentifier = null }) {
+  if (!apiKey) throw requestError('Voice transcription is not configured.', 503);
+  const form = new FormData();
+  form.append('model', model);
+  form.append('file', new Blob([buffer], { type: mimeType || 'audio/webm' }), 'recording.webm');
+  if (language) form.append('language', language);
+  const response = await fetch(`${OPENAI_API_BASE}/audio/transcriptions`, {
+    method: 'POST',
+    headers: buildHeaders(apiKey, safetyIdentifier),
+    body: form
+  });
+  if (!response.ok) throw requestError(await parseApiError(response), response.status);
+  const result = await response.json();
+  return typeof result?.text === 'string' ? result.text.trim() : '';
 }

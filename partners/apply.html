@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Apply as Partner | Fish &amp; Spices</title>
+  <link rel="icon" href="/assets/brand/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=9">
+  <link rel="stylesheet" href="/assets/css/partner-network.css">
+  <script src="/assets/js/main.js?v=4" defer></script>
+  <script src="/assets/js/partners-apply.js" defer></script>
+</head>
+<body class="partner-shell">
+  <header class="partner-topbar">
+    <a class="brand" href="/"><img src="/assets/brand/logo-mark.svg" width="44" height="44" alt=""><span class="brand-copy"><strong>Fish <span>&amp;</span> Spices</strong><small>Partner Network</small></span></a>
+    <nav class="partner-nav" aria-label="Partner navigation">
+      <a href="/partners/index.html">Overview</a>
+      <a href="/partners/apply.html" aria-current="page">Apply</a>
+      <a href="/partners/terms.html">Terms</a>
+      <a href="/partner/dashboard.html">Partner dashboard</a>
+    </nav>
+  </header>
+
+  <main class="partner-main">
+    <section class="partner-card">
+      <p class="eyebrow">Public application</p>
+      <h1 style="margin-top:8px;">Partner Application Form</h1>
+      <p>Submit your details for review. Approved partners receive a unique partner code and campaign dashboard access.</p>
+      <p class="partner-status" data-referral-status></p>
+    </section>
+
+    <section class="partner-card" style="margin-top:14px;">
+      <form class="partner-form" data-partner-apply-form>
+        <div class="row">
+          <label>Partner type
+            <select name="partnerType" required>
+              <option value="">Select partner type</option>
+              <option>INFLUENCER</option><option>FIELD_AGENT</option><option>FPO</option><option>COOPERATIVE</option>
+              <option>CONSULTANT</option><option>TRADE_ASSOCIATION</option><option>WHATSAPP_ADMIN</option>
+              <option>TELEGRAM_ADMIN</option><option>AFFILIATE</option><option>SALES_PARTNER</option><option>OTHER</option>
+            </select>
+          </label>
+          <label>Display name
+            <input name="displayName" required maxlength="120" placeholder="Public partner name">
+          </label>
+        </div>
+
+        <div class="row">
+          <label>Contact person
+            <input name="contactPerson" maxlength="120" placeholder="Primary contact">
+          </label>
+          <label>Email
+            <input name="email" type="email" required maxlength="200" placeholder="you@example.com">
+          </label>
+        </div>
+
+        <div class="row">
+          <label>Phone
+            <input name="phone" required maxlength="40" placeholder="+91..."></label>
+          <label>WhatsApp number
+            <input name="whatsappNumber" maxlength="40" placeholder="Optional">
+          </label>
+        </div>
+
+        <div class="row">
+          <label>Country
+            <input name="country" maxlength="80" placeholder="India"></label>
+          <label>State
+            <input name="state" maxlength="80" placeholder="Kerala">
+          </label>
+        </div>
+
+        <div class="row">
+          <label>District
+            <input name="district" maxlength="80" placeholder="Ernakulam"></label>
+          <label>City
+            <input name="city" maxlength="80" placeholder="Kochi">
+          </label>
+        </div>
+
+        <div class="row">
+          <label>Primary platform
+            <input name="primaryPlatform" maxlength="80" placeholder="Instagram, YouTube, Field network">
+          </label>
+          <label>Niche
+            <input name="niche" maxlength="120" placeholder="Fish trade, spice exports, sourcing advisory">
+          </label>
+        </div>
+
+        <div class="row">
+          <label>Follower or network size
+            <input name="followerCount" type="number" min="0" step="1" placeholder="Optional">
+          </label>
+          <label>Legal name (optional)
+            <input name="legalName" maxlength="160" placeholder="Registered entity name">
+          </label>
+        </div>
+
+        <label>Notes
+          <textarea name="notes" maxlength="2000" placeholder="Tell us about your audience, network quality, and expected outreach."></textarea>
+        </label>
+
+        <button class="button button-dark" type="submit">Submit application</button>
+        <p class="partner-status" data-apply-status></p>
+      </form>
+    </section>
+  </main>
+</body>
+</html>

@@ -22,11 +22,22 @@ function boundedInt(value, fallback, min, max) {
   return Math.min(max, Math.max(min, Math.trunc(numeric)));
 }
 
+function boundedNumber(value, fallback, min, max) {
+  const numeric = Number(value ?? fallback);
+  if (!Number.isFinite(numeric)) return fallback;
+  return Math.min(max, Math.max(min, numeric));
+}
+
 export function loadConfig(environment = process.env) {
   const nodeEnv = environment.NODE_ENV || 'development';
   const isHosted = nodeEnv === 'production' || nodeEnv === 'staging';
   const aiAssistantEnabled = normalizeBoolean(environment.AI_ASSISTANT_ENABLED, false);
   const aiAssistantDefaultMode = environment.AI_ASSISTANT_DEFAULT_MODE || 'text_only';
+  const partnerNetworkEnabled = normalizeBoolean(environment.PARTNER_NETWORK_ENABLED, false);
+  const aiMarketingEnabled = normalizeBoolean(environment.AI_MARKETING_ENABLED, true);
+  const aiMarketingSimulationMode = normalizeBoolean(environment.AI_MARKETING_SIMULATION_MODE, true);
+  const aiExternalActionsEnabled = normalizeBoolean(environment.AI_EXTERNAL_ACTIONS_ENABLED, false);
+  const aiAutopublishEnabled = normalizeBoolean(environment.AI_AUTOPUBLISH_ENABLED, false);
   if (isHosted) {
     const required = nodeEnv === 'production' ? [...requiredInHostedEnvironment, ...requiredInProduction] : requiredInHostedEnvironment;
     const missing = required.filter(name => !environment[name]);
@@ -84,6 +95,31 @@ export function loadConfig(environment = process.env) {
     aiRealtimeEnabled: normalizeBoolean(environment.AI_REALTIME_ENABLED, false),
     aiTtsModel: environment.AI_TTS_MODEL || 'gpt-4o-mini-tts',
     aiSttModel: environment.AI_STT_MODEL || 'gpt-transcribe',
+    aiProvider: environment.AI_PROVIDER || 'openai',
+    aiModelEconomy: environment.AI_MODEL_ECONOMY || 'gpt-5-mini',
+    aiModelStandard: environment.AI_MODEL_STANDARD || 'gpt-5.4',
+    aiModelPremium: environment.AI_MODEL_PREMIUM || 'gpt-5.4',
+    aiMarketingEnabled,
+    aiMarketingSimulationMode,
+    aiExternalActionsEnabled,
+    aiAutopublishEnabled,
+    aiMarketingDirectorEnabled: normalizeBoolean(environment.AI_MARKETING_DIRECTOR_ENABLED, true),
+    aiContentStrategistEnabled: normalizeBoolean(environment.AI_CONTENT_STRATEGIST_ENABLED, true),
+    aiSocialAgentEnabled: normalizeBoolean(environment.AI_SOCIAL_AGENT_ENABLED, true),
+    aiAnalyticsAgentEnabled: normalizeBoolean(environment.AI_ANALYTICS_AGENT_ENABLED, true),
+    aiMonthlyBudgetAed: boundedNumber(environment.AI_MONTHLY_BUDGET_AED, 500, 0, 1_000_000),
+    aiWarningThresholdPercent: boundedNumber(environment.AI_WARNING_THRESHOLD_PERCENT, 70, 1, 100),
+    aiCriticalThresholdPercent: boundedNumber(environment.AI_CRITICAL_THRESHOLD_PERCENT, 90, 1, 100),
+    marketingTimezone: environment.MARKETING_TIMEZONE || 'Asia/Kolkata',
+    aiRawPayloadRetentionDays: boundedInt(environment.AI_RAW_PAYLOAD_RETENTION_DAYS, 30, 1, 365),
+    aiMarketingMaxRunCostAed: boundedNumber(environment.AI_MARKETING_MAX_RUN_COST_AED, 25, 0, 10_000),
+    aiMarketingProviderTimeoutMs: boundedInt(environment.AI_MARKETING_PROVIDER_TIMEOUT_MS, 60_000, 5_000, 180_000),
+    partnerNetworkEnabled,
+    partnerPublicApplicationsEnabled: normalizeBoolean(environment.PARTNER_PUBLIC_APPLICATIONS_ENABLED, true),
+    partnerPayoutRequestsEnabled: normalizeBoolean(environment.PARTNER_PAYOUT_REQUESTS_ENABLED, false),
+    partnerReferralCookieDays: boundedInt(environment.PARTNER_REFERRAL_COOKIE_DAYS, 30, 1, 180),
+    partnerDefaultCurrency: (environment.PARTNER_DEFAULT_CURRENCY || 'INR').toUpperCase(),
+    partnerAutoApproval: normalizeBoolean(environment.PARTNER_AUTO_APPROVAL, false),
     approximateLocationProvider,
     locationProxySecret: environment.LOCATION_PROXY_SECRET || '',
     locationRetentionDays: Math.max(1, Number(environment.LOCATION_RETENTION_DAYS || 365)),

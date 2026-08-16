@@ -8,6 +8,10 @@ import { createLeadRouter } from './leads.js';
 import { createMarketplaceAccountRouter } from './marketplace-account.js';
 import { createMarketplaceRouter } from './marketplace.js';
 import { createMeRouter } from './me.js';
+import { createMarketingAiAdminRouter } from './marketing-ai-admin.js';
+import { createPartnersAdminRouter } from './partners-admin.js';
+import { createPartnerDashboardRouter } from './partner-dashboard.js';
+import { createPartnersPublicRouter } from './partners-public.js';
 import { deriveApproximateLocation } from '../services/location.js';
 import { getPublicOptions } from '../services/master-data.js';
 
@@ -39,15 +43,19 @@ export function createApiRouter({ config, pool, services }) {
     approximateLocation: deriveApproximateLocation(request, config)
   }));
   router.use('/v1/leads', createLeadRouter({ config, pool, services }));
+  if (pool) router.use('/v1/partners', createPartnersPublicRouter({ config, pool }));
   if (pool) router.use('/v1', createMarketplaceRouter({ pool, services }));
   if (pool) {
     router.use('/v1/ai', createAiAssistantRouter({ config, pool, services }));
+    router.use('/v1/partner', createPartnerDashboardRouter({ config, pool }));
     router.use('/v1', createMarketplaceAccountRouter({ config, pool, services }));
     router.use('/v1/auth', createAuthRouter({ config, pool, services }));
     router.use('/v1/customer-auth', createCustomerAuthRouter({ config, pool, services }));
     router.use('/v1/me/locations', createCustomerLocationRouter({ config, pool }));
     router.use('/v1/me', createMeRouter({ config, pool }));
     router.use('/v1/admin', createAdminRouter({ config, pool }));
+    router.use('/v1/admin/marketing-ai', createMarketingAiAdminRouter({ config, pool }));
+    router.use('/v1/admin/partners', createPartnersAdminRouter({ config, pool }));
   }
 
   return router;

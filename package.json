@@ -8,6 +8,8 @@
   },
   "scripts": {
     "start": "node server/index.js",
+    "start:marketing-worker": "node server/marketing-worker.js",
+    "marketing-worker:once": "node server/marketing-worker.js --once",
     "dev": "node --watch server/index.js",
     "migrate": "node scripts/migrate.mjs",
     "bootstrap-admin": "node scripts/bootstrap-admin.mjs",
@@ -23,6 +25,7 @@
     "express": "^5.1.0",
     "helmet": "^8.1.0",
     "libphonenumber-js": "^1.13.11",
+    "multer": "^2.2.0",
     "pg": "^8.16.3",
     "zod": "^4.0.17"
   },

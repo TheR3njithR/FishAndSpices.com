@@ -1,0 +1,12 @@
+.assistant-main { min-height: 100vh; padding: 108px 20px 40px; background: #edf5f3; }
+.assistant-shell { display: grid; grid-template-rows: auto minmax(360px, 1fr) auto auto auto; width: min(100%, 860px); min-height: min(760px, calc(100vh - 148px)); margin: auto; background: #fff; box-shadow: 0 24px 70px rgb(4 31 48 / .16); }
+.assistant-header { display: flex; justify-content: space-between; gap: 24px; padding: 28px; color: #fff; background: #042b42; }
+.assistant-header h1 { margin: 3px 0 8px; font-size: clamp(1.8rem, 4vw, 2.8rem); }.assistant-header p { color: #cce0e5; }
+.assistant-mode { align-self: start; padding: 8px 10px; color: #042b42; background: #f6c453; font-size: .78rem; font-weight: 800; }
+.assistant-transcript { display: grid; align-content: start; gap: 14px; padding: 24px; overflow-y: auto; background: #f8fbfa; }
+.assistant-message { max-width: 82%; padding: 15px 17px; border-radius: 6px; line-height: 1.5; }.assistant-message strong { display: block; margin-bottom: 6px; font-size: .78rem; }.assistant-message p { white-space: pre-wrap; }
+.assistant-message-ai { color: #102e40; background: #dff4ef; }.assistant-message-user { justify-self: end; color: #fff; background: #0c6570; }
+.assistant-status, .assistant-privacy { margin: 0; padding: 10px 24px; color: #52656f; font-size: .85rem; }.assistant-status { border-top: 1px solid #d9e3e0; }
+.assistant-composer { display: grid; grid-template-columns: 1fr 50px auto; gap: 10px; padding: 16px 24px 12px; }.assistant-composer textarea { min-height: 50px; max-height: 150px; padding: 13px; border: 1px solid #9eb2b8; border-radius: 4px; resize: vertical; font: inherit; }.assistant-composer textarea:focus { border-color: #0c6570; outline: 3px solid rgb(12 101 112 / .2); }
+.assistant-icon-button { border: 0; color: #fff; background: #0c6570; font: inherit; font-weight: 800; cursor: pointer; }.assistant-icon-button:disabled { cursor: wait; opacity: .55; }.assistant-voice-actions { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 24px 12px; }
+@media (max-width: 700px) { .assistant-main { padding: 72px 0 0; }.assistant-shell { min-height: calc(100vh - 72px); }.assistant-header { padding: 20px; }.assistant-header p { font-size: .9rem; }.assistant-transcript { padding: 16px; }.assistant-message { max-width: 90%; }.assistant-composer { grid-template-columns: 1fr 46px; padding: 12px 16px; }.assistant-composer [data-send] { grid-column: 1 / -1; }.assistant-status, .assistant-privacy { padding-inline: 16px; }.assistant-voice-actions { padding-inline: 16px; } }

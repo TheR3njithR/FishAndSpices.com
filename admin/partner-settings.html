@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Admin Partner Settings | Fish &amp; Spices</title>
+  <link rel="icon" href="/assets/brand/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=9">
+  <link rel="stylesheet" href="/admin/admin.css?v=3">
+  <link rel="stylesheet" href="/assets/css/partner-network.css">
+  <script src="/admin/partners-admin.js" defer></script>
+</head>
+<body class="inner-page admin-page partner-shell" data-admin-partner-page="settings">
+  <header class="partner-topbar">
+    <a class="brand" href="/admin"><img src="/assets/brand/logo-mark.svg" width="44" height="44" alt=""><span class="brand-copy"><strong>Fish <span>&amp;</span> Spices</strong><small>Administrator workspace</small></span></a>
+    <nav class="partner-nav" aria-label="Admin partner navigation">
+      <a href="/admin/partners.html">Partners</a>
+      <a href="/admin/partner-settings.html" aria-current="page">Settings</a>
+      <a href="/admin/partner-settings/commission-plans.html">Commission plans</a>
+      <a href="/admin/index.html">Lead operations</a>
+    </nav>
+  </header>
+
+  <main class="partner-main">
+    <section class="partner-card">
+      <h1>Global partner settings</h1>
+      <p>Feature controls and baseline policy values for attribution, commission and payout behavior.</p>
+      <p class="partner-status" data-admin-partner-status></p>
+    </section>
+
+    <section class="partner-card" style="margin-top:14px;">
+      <form class="partner-form" data-admin-settings-form>
+        <div class="row">
+          <label>Referral cookie days
+            <input name="referral_cookie_days" type="number" min="1" max="180"></label>
+          <label>Minimum payout amount
+            <input name="minimum_payout_amount" type="number" min="0" step="1"></label>
+        </div>
+
+        <div class="row">
+          <label>Default currency
+            <select name="default_currency"><option>INR</option><option>AED</option><option>USD</option><option>EUR</option><option>GBP</option></select>
+          </label>
+          <label>Fraud review threshold
+            <select name="fraud_review_threshold"><option>LOW</option><option>MEDIUM</option><option>HIGH</option><option>CRITICAL</option></select>
+          </label>
+        </div>
+
+        <div class="row">
+          <label>Commission hold period days
+            <input name="commission_hold_period_days" type="number" min="0" max="90"></label>
+          <label>Payout frequency label
+            <input name="payout_frequency" maxlength="40" placeholder="monthly"></label>
+        </div>
+
+        <div class="row">
+          <label>Public applications enabled
+            <select name="partner_application_enabled"><option>true</option><option>false</option></select>
+          </label>
+          <label>Auto approval enabled
+            <select name="partner_auto_approval"><option>false</option><option>true</option></select>
+          </label>
+        </div>
+
+        <button class="button button-dark" type="submit">Save settings</button>
+      </form>
+    </section>
+  </main>
+</body>
+</html>

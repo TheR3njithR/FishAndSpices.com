@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Admin Partners | Fish &amp; Spices</title>
+  <link rel="icon" href="/assets/brand/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=9">
+  <link rel="stylesheet" href="/admin/admin.css?v=3">
+  <link rel="stylesheet" href="/assets/css/partner-network.css">
+  <script src="/admin/partners-admin.js" defer></script>
+</head>
+<body class="inner-page admin-page partner-shell" data-admin-partner-page="partners">
+  <header class="partner-topbar">
+    <a class="brand" href="/admin"><img src="/assets/brand/logo-mark.svg" width="44" height="44" alt=""><span class="brand-copy"><strong>Fish <span>&amp;</span> Spices</strong><small>Administrator workspace</small></span></a>
+    <nav class="partner-nav" aria-label="Admin partner navigation">
+      <a href="/admin/partners.html" aria-current="page">Partners</a>
+      <a href="/admin/partner-settings.html">Settings</a>
+      <a href="/admin/partner-settings/commission-plans.html">Commission plans</a>
+      <a href="/admin/index.html">Lead operations</a>
+    </nav>
+  </header>
+
+  <main class="partner-main">
+    <section class="partner-card">
+      <h1>Partner network operations</h1>
+      <p>Review applications, update partner status, and monitor program performance.</p>
+      <p class="partner-status" data-admin-partner-status></p>
+    </section>
+
+    <section class="partner-summary" data-admin-overview style="margin-top:14px;"></section>
+
+    <section class="partner-card" style="margin-top:14px;">
+      <form class="partner-form" data-admin-partners-filters>
+        <div class="row">
+          <label>Search
+            <input name="search" placeholder="Name, code, email, social handle">
+          </label>
+          <label>Status
+            <select name="status"><option value="">All</option><option>PENDING</option><option>ACTIVE</option><option>SUSPENDED</option><option>REJECTED</option><option>INACTIVE</option></select>
+          </label>
+        </div>
+        <div class="row">
+          <label>Partner type
+            <select name="partnerType"><option value="">All</option><option>INFLUENCER</option><option>FIELD_AGENT</option><option>FPO</option><option>COOPERATIVE</option><option>CONSULTANT</option><option>TRADE_ASSOCIATION</option><option>WHATSAPP_ADMIN</option><option>TELEGRAM_ADMIN</option><option>AFFILIATE</option><option>SALES_PARTNER</option><option>OTHER</option></select>
+          </label>
+          <label>Country
+            <input name="country" placeholder="India"></label>
+        </div>
+        <button class="button button-dark button-small" type="submit">Apply filters</button>
+      </form>
+    </section>
+
+    <section class="partner-grid" style="margin-top:14px;">
+      <article class="partner-card" style="grid-column: span 8;">
+        <div class="partner-table-wrap">
+          <table class="partner-table">
+            <thead><tr><th>Partner</th><th>Type</th><th>Email</th><th>Status</th><th>Referrals</th><th>Payable</th></tr></thead>
+            <tbody data-admin-partners-table><tr><td colspan="6">Loading partners...</td></tr></tbody>
+          </table>
+        </div>
+      </article>
+      <aside class="partner-card" style="grid-column: span 4;" data-admin-partner-detail>
+        <h2>Select a partner</h2>
+        <p>Choose a row to view details and run status actions.</p>
+      </aside>
+    </section>
+  </main>
+</body>
+</html>

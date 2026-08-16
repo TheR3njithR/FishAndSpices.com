@@ -7,6 +7,7 @@ import {
   removeMarketplaceItem,
   saveMarketplaceItem
 } from '../services/marketplace-account.js';
+import { emitPartnerEvent } from '../services/partner-network.js';
 
 export function createMarketplaceAccountRouter({ config, pool, services = {} }) {
   const router = Router();
@@ -46,6 +47,33 @@ export function createMarketplaceAccountRouter({ config, pool, services = {} }) 
         validUntil: request.body?.validUntil,
         notes: request.body?.notes
       });
+
+      if (config.partnerNetworkEnabled) {
+        emitPartnerEvent({
+          pool,
+          config,
+          userId: request.customerSession.userId,
+          eventType: 'QUOTE_SUBMITTED',
+          entityType: 'quote',
+          entityId: quote.id,
+          userRole: 'seller',
+          metadata: {
+            source: 'marketplace_quote',
+            requirementLeadId: request.body?.requirementLeadId || null,
+            sellerLeadId: request.body?.sellerLeadId || null
+          },
+          dedupeKey: `partner:quote:${quote.id}`
+        }).catch(partnerError => {
+          console.warn(JSON.stringify({
+            level: 'warn',
+            event: 'partner_quote_hook_failed',
+            message: partnerError.message,
+            userId: request.customerSession.userId,
+            quoteId: quote.id
+          }));
+        });
+      }
+
       response.status(201).json({ success: true, quote });
     } catch (error) {
       next(error);

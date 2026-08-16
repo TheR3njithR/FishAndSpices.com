@@ -26,6 +26,23 @@ if (header && !header.querySelector('[data-customer-sign-in]')) {
   header.querySelector('.header-inner')?.insertBefore(signIn, header.querySelector('.language-control, .header-actions'));
 }
 
+if (navigation && !navigation.querySelector('[data-partner-nav-link]')) {
+  const partnerLink = document.createElement('a');
+  partnerLink.href = '/partners/index.html';
+  partnerLink.textContent = 'Partners';
+  partnerLink.dataset.partnerNavLink = '';
+  navigation.appendChild(partnerLink);
+}
+
+if (!document.body.classList.contains('assistant-page') && !document.querySelector('[data-assistant-launcher]')) {
+  const assistantLink = document.createElement('a');
+  assistantLink.href = '/assistant';
+  assistantLink.className = 'assistant-launcher';
+  assistantLink.dataset.assistantLauncher = '';
+  assistantLink.textContent = 'Ask FishAndSpices';
+  document.body.appendChild(assistantLink);
+}
+
 const closeMenu = () => {
   setMenuOpenState(false);
 };
@@ -74,3 +91,49 @@ if (window.FS_CONFIG) {
     link.href = `mailto:${window.FS_CONFIG.businessEmail}${subject}`;
   });
 }
+
+async function capturePartnerReferralFromQuery() {
+  const params = new URLSearchParams(window.location.search);
+  const ref = params.get('ref');
+  if (!ref) return;
+
+  const cacheKey = `fas-partner-ref-captured:${window.location.pathname}:${window.location.search}`;
+  try {
+    if (window.sessionStorage?.getItem(cacheKey)) return;
+  } catch {
+    // Ignore storage failures and continue with best-effort capture.
+  }
+
+  try {
+    const response = await fetch('/api/v1/partners/referrals/capture', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: {
+        'content-type': 'application/json',
+        accept: 'application/json'
+      },
+      body: JSON.stringify({
+        ref,
+        campaign: params.get('campaign') || params.get('campaign_code'),
+        landingPage: `${window.location.pathname}${window.location.search}`,
+        utmSource: params.get('utm_source'),
+        utmMedium: params.get('utm_medium'),
+        utmCampaign: params.get('utm_campaign'),
+        utmTerm: params.get('utm_term'),
+        utmContent: params.get('utm_content')
+      })
+    });
+
+    if (response.ok) {
+      try {
+        window.sessionStorage?.setItem(cacheKey, '1');
+      } catch {
+        // Ignore storage failures.
+      }
+    }
+  } catch {
+    // Best-effort only. We intentionally suppress errors for public page UX.
+  }
+}
+
+capturePartnerReferralFromQuery();

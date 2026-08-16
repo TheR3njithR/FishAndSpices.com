@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>AI Marketing Team | Fish &amp; Spices</title>
+  <link rel="icon" href="../assets/brand/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../assets/css/styles.css?v=9"><link rel="stylesheet" href="../assets/css/pages.css?v=2">
+  <link rel="stylesheet" href="/admin/admin.css?v=3"><link rel="stylesheet" href="/admin/marketing-ai.css?v=1">
+  <script src="/admin/marketing-ai.js?v=1" defer></script>
+</head>
+<body class="inner-page admin-page marketing-ai-page">
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <header class="admin-header"><a class="brand" href="/admin"><img src="../assets/brand/logo-mark.svg" width="46" height="46" alt=""><span class="brand-copy"><strong>Fish <span>&amp;</span> Spices</strong><small>AI Marketing Team</small></span></a><div class="header-actions"><span class="mode-chip" data-simulation>Simulation</span><a class="button button-small button-light" href="/admin">Lead operations</a><button class="button button-small button-light" type="button" data-sign-out>Sign out</button></div></header>
+  <main id="main-content" class="marketing-shell" hidden data-workspace>
+    <div class="marketing-title"><div><p class="eyebrow">Founder control centre</p><h1>AI Marketing Team</h1><p data-identity></p></div><div class="system-control"><span>AI Marketing</span><strong data-system-status>Checking</strong><button class="power-button" type="button" data-kill-switch aria-label="Turn AI Marketing off">OFF</button></div></div>
+    <nav class="marketing-tabs" aria-label="AI Marketing views" data-tabs>
+      <button class="is-active" data-tab="overview">Overview</button><button data-tab="agents">Agents</button><button data-tab="tasks">Tasks</button><button data-tab="approvals">Approvals</button><button data-tab="content">Content</button><button data-tab="calendar">Calendar</button><button data-tab="campaigns">Campaigns</button><button data-tab="goals">Goals</button><button data-tab="analytics">Analytics</button><button data-tab="costs">Costs</button><button data-tab="activity">Activity</button><button data-tab="settings">Settings</button>
+    </nav>
+    <p class="workspace-message" data-message aria-live="polite"></p>
+    <section data-panel="overview"><div data-overview></div></section>
+    <section data-panel="agents" hidden><div class="section-heading"><div><p class="eyebrow">Configured workforce</p><h2>Agents</h2></div><button class="button button-small button-light" data-refresh="agents">Refresh</button></div><div class="agent-grid" data-agents></div></section>
+    <section data-panel="tasks" hidden><div class="section-heading"><div><p class="eyebrow">Work queue</p><h2>Tasks</h2></div><select data-task-status><option value="">All statuses</option><option>QUEUED</option><option>RUNNING</option><option>WAITING_APPROVAL</option><option>COMPLETED</option><option>FAILED</option><option>BLOCKED</option></select></div><div class="table-frame" data-tasks></div></section>
+    <section data-panel="approvals" hidden><div class="section-heading"><div><p class="eyebrow">Founder decisions</p><h2>Approval Queue</h2></div><select data-approval-status><option value="PENDING">Pending</option><option value="">All</option><option>APPROVED</option><option>REJECTED</option><option>CHANGES_REQUESTED</option></select></div><div class="approval-grid" data-approvals></div></section>
+    <section data-panel="content" hidden><div class="section-heading"><div><p class="eyebrow">Draft library</p><h2>Content</h2></div><select data-content-status><option value="">All statuses</option><option>DRAFT</option><option>AWAITING_APPROVAL</option><option>APPROVED</option><option>REJECTED</option><option>PUBLISHED</option></select></div><div class="content-list" data-content></div></section>
+    <section data-panel="calendar" hidden><div class="section-heading"><div><p class="eyebrow">Production schedule</p><h2>Content Calendar</h2></div><div class="segmented"><button class="is-active" data-calendar-view="week">This Week</button><button data-calendar-view="month">Month</button><button data-calendar-view="drafts">Drafts</button></div></div><div class="calendar-board" data-calendar></div></section>
+    <section data-panel="campaigns" hidden><div class="section-heading"><div><p class="eyebrow">Organic-first programmes</p><h2>Campaigns</h2></div><button class="button button-small button-dark" data-open-form="campaign">New campaign</button></div><form class="inline-editor" data-campaign-form hidden><input name="name" placeholder="Campaign name" required><input name="slug" placeholder="campaign-slug" required><input name="objective" placeholder="Business objective" required><input name="persona" placeholder="Persona"><input name="geography" placeholder="Geography"><select name="language"><option>Malayalam</option><option>English</option></select><button class="button button-small button-dark">Create draft</button></form><div class="record-grid" data-campaigns></div></section>
+    <section data-panel="goals" hidden><div class="section-heading"><div><p class="eyebrow">Business outcomes</p><h2>Marketing Goals</h2></div><button class="button button-small button-dark" data-open-form="goal">New goal</button></div><form class="inline-editor" data-goal-form hidden><input name="name" placeholder="Goal name" required><input name="description" placeholder="Description"><input name="startDate" type="date" required><input name="targetSellerRegistrations" type="number" min="0" placeholder="Seller target"><input name="targetBuyerRegistrations" type="number" min="0" placeholder="Buyer target"><button class="button button-small button-dark">Create draft</button></form><div class="record-grid" data-goals></div></section>
+    <section data-panel="analytics" hidden><div class="section-heading"><div><p class="eyebrow">Evidence, not vanity</p><h2>Analytics &amp; Daily Brief</h2></div></div><div data-reports></div></section>
+    <section data-panel="costs" hidden><div class="section-heading"><div><p class="eyebrow">AED budget control</p><h2>AI Costs</h2></div></div><div data-costs></div></section>
+    <section data-panel="activity" hidden><div class="section-heading"><div><p class="eyebrow">Auditable execution</p><h2>Run History</h2></div></div><div class="table-frame" data-activity></div></section>
+    <section data-panel="settings" hidden><div class="section-heading"><div><p class="eyebrow">Fail-safe controls</p><h2>Settings &amp; Health</h2></div></div><div data-settings></div></section>
+  </main>
+  <section class="admin-auth" data-auth-required hidden><p class="eyebrow">Protected access</p><h1>Administrator session required</h1><p>Sign in through the administrator workspace to manage the AI Marketing Team.</p><a class="button button-dark" href="/admin">Administrator sign in</a></section>
+</body>
+</html>

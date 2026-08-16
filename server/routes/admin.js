@@ -3,6 +3,7 @@ import { requireAuthentication, requireCsrf } from '../auth-middleware.js';
 import { withTransaction } from '../db.js';
 import { writeAudit } from '../services/audit.js';
 import { suggestMatches } from '../services/matching.js';
+import { emitPartnerEvent } from '../services/partner-network.js';
 import { createOption, getAdminOptions, MasterDataError, updateOption } from '../services/master-data.js';
 
 const allowedLeadUpdates = {
@@ -336,6 +337,50 @@ export function createAdminRouter({ config, pool }) {
         await writeAudit(client, { administratorId: request.adminSession.user.id, action: 'match_proposed', entityType: 'match', entityIdentifier: result.rows[0].id, newValues: result.rows[0] });
         return result.rows[0];
       });
+
+      if (config.partnerNetworkEnabled) {
+        Promise.all([
+          pool.query('select customer_user_id as "userId" from leads where id = $1 limit 1', [request.body.buyerLeadId]),
+          pool.query('select customer_user_id as "userId" from leads where id = $1 limit 1', [request.body.sellerLeadId])
+        ]).then(async ([buyerLead, sellerLead]) => {
+          const buyerUserId = buyerLead.rows[0]?.userId || null;
+          const sellerUserId = sellerLead.rows[0]?.userId || null;
+          if (buyerUserId) {
+            await emitPartnerEvent({
+              pool,
+              config,
+              userId: buyerUserId,
+              eventType: 'MATCH_CREATED',
+              entityType: 'match',
+              entityId: match.id,
+              userRole: 'buyer',
+              metadata: { source: 'admin_match', leadId: request.body.buyerLeadId },
+              dedupeKey: `partner:match:buyer:${match.id}`
+            });
+          }
+          if (sellerUserId) {
+            await emitPartnerEvent({
+              pool,
+              config,
+              userId: sellerUserId,
+              eventType: 'MATCH_CREATED',
+              entityType: 'match',
+              entityId: match.id,
+              userRole: 'seller',
+              metadata: { source: 'admin_match', leadId: request.body.sellerLeadId },
+              dedupeKey: `partner:match:seller:${match.id}`
+            });
+          }
+        }).catch(partnerError => {
+          console.warn(JSON.stringify({
+            level: 'warn',
+            event: 'partner_match_hook_failed',
+            message: partnerError.message,
+            matchId: match.id
+          }));
+        });
+      }
+
       response.status(201).json({ success: true, match });
     } catch (error) { next(error); }
   });

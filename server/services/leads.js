@@ -142,7 +142,7 @@ export async function createLead({ pool, data, requestIp, config, fetcher, appro
           'role', $2::text, 'category', $3::text, 'identity_association', $4::text
         ))`,
       [reference, data.role, data.category, identity.associatedBy]);
-      return { leadId, reference, role: data.role, category: data.category };
+      return { leadId, reference, role: data.role, category: data.category, userId: identity.userId };
     });
   } catch (error) {
     if (error.code === '23505' && String(error.constraint).includes('submission_key')) throw new DuplicateSubmissionError();
@@ -152,5 +152,5 @@ export async function createLead({ pool, data, requestIp, config, fetcher, appro
   await notifyAdministrator({ pool, ...result, config, fetcher }).catch(error => {
     console.error(JSON.stringify({ level: 'warn', event: 'lead_notification_failed', reference: result.reference, message: error.message }));
   });
-  return { reference: result.reference };
+  return { reference: result.reference, leadId: result.leadId, userId: result.userId, role: result.role, category: result.category };
 }

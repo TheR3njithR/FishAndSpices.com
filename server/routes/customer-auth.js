@@ -6,6 +6,12 @@ import {
 import {
   requestChallenge, revokeCustomerSession, revokeCustomerSessionToken, rotateCustomerCsrf, verifyChallenge
 } from '../services/customer-auth.js';
+import {
+  emitPartnerEvent,
+  linkReferralToUserFromCookie,
+  markPartnerReferralOtpVerified,
+  partnerReferralCookieName
+} from '../services/partner-network.js';
 
 export function createCustomerAuthRouter({ config, pool, services = {} }) {
   const router = Router();
@@ -33,6 +39,53 @@ export function createCustomerAuthRouter({ config, pool, services = {} }) {
         pool, challengeId: request.body?.challengeId, code: request.body?.code,
         ip: request.ip, userAgent: request.get('user-agent'), config
       });
+
+      if (config.partnerNetworkEnabled && result.userId) {
+        try {
+          const referralCookieToken = request.cookies[partnerReferralCookieName(config)] || null;
+          await linkReferralToUserFromCookie({
+            pool,
+            config,
+            userId: result.userId,
+            referralCookieToken,
+            userRole: null
+          });
+          await markPartnerReferralOtpVerified(pool, result.userId);
+          await emitPartnerEvent({
+            pool,
+            config,
+            userId: result.userId,
+            eventType: 'REGISTRATION',
+            entityType: 'customer_user',
+            entityId: result.userId,
+            dedupeKey: `partner:registration:${result.userId}`,
+            metadata: {
+              source: 'customer_otp_verify',
+              challengeId: request.body?.challengeId || null
+            }
+          });
+          await emitPartnerEvent({
+            pool,
+            config,
+            userId: result.userId,
+            eventType: 'OTP_VERIFIED',
+            entityType: 'otp_challenge',
+            entityId: request.body?.challengeId || null,
+            dedupeKey: `partner:otp:${request.body?.challengeId || result.userId}`,
+            metadata: {
+              source: 'customer_otp_verify'
+            }
+          });
+        } catch (partnerError) {
+          console.warn(JSON.stringify({
+            level: 'warn',
+            event: 'partner_otp_hook_failed',
+            message: partnerError.message,
+            userId: result.userId
+          }));
+        }
+      }
+
       response.cookie(customerSessionCookieName(config), result.sessionToken, customerSessionCookieOptions(config, result.expiresAt));
       response.json({ success: true, csrfToken: result.csrfToken, expiresAt: result.expiresAt, claimedRecords: result.claims.linked, claimsNeedingReview: result.claims.review });
     } catch (error) {
