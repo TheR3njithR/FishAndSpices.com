@@ -32,8 +32,7 @@ export async function createModelResponse({ apiKey, model, input, tools = [], to
     input,
     tools,
     tool_choice: toolChoice,
-    metadata: metadata || undefined,
-    temperature: 0.2
+    metadata: metadata || undefined
   };
   if (responseFormat) payload.text = { format: responseFormat };
   const response = await fetch(`${OPENAI_API_BASE}/responses`, {
