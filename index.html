@@ -1,212 +1,112 @@
 <!doctype html>
 <html lang="en">
 <head>
+  <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-SEN2GPQGB7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-SEN2GPQGB7');
+</script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Fish &amp; Spices | Commercial Sourcing and Trade Introductions</title>
-  <meta name="description" content="Submit commercial buying requirements or list available fish, seafood and spice stock for structured lead qualification and potential business matching.">
-  <meta name="theme-color" content="#07324a">
-  <meta property="og:title" content="Fish &amp; Spices | Commercial Sourcing Network">
-  <meta property="og:description" content="Connecting food supply with commercial demand.">
+  <title>FishAndSpices.com | Buy &amp; Sell Fish, Spices &amp; Farm Products</title>
+  <meta name="description" content="Search and discover fish, spices and farm products. FishAndSpices.com connects buyers, sellers, farmers and businesses through a moderated marketplace.">
+  <meta name="theme-color" content="#0b4d2c">
+  <meta property="og:title" content="FishAndSpices.com | Buy &amp; Sell Fish, Spices &amp; Farm Products">
+  <meta property="og:description" content="Find buyers and sellers for fish, spices and farm products.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://fishandspices.com/">
   <meta property="og:image" content="https://fishandspices.com/assets/images/aquaculture-supply.jpg">
   <link rel="canonical" href="https://fishandspices.com/">
   <link rel="icon" href="assets/brand/favicon.svg" type="image/svg+xml">
-  <link rel="preload" href="assets/images/fish-sorting.jpg" as="image" fetchpriority="high">
+  <link rel="preload" href="assets/images/marketplace-hero-fish-spices.png" as="image" fetchpriority="high">
   <link rel="stylesheet" href="assets/css/styles.css?v=9">
+  <link rel="stylesheet" href="assets/css/home.css?v=4">
   <script type="application/ld+json">
     {"@context":"https://schema.org","@type":"Organization","name":"Fish & Spices","url":"https://fishandspices.com/","logo":"https://fishandspices.com/assets/brand/logo-mark.svg","description":"Independent commercial lead-generation, sourcing and business-introduction platform for fish, seafood and spices."}
   </script>
   <script src="assets/js/config.js" defer></script>
   <script src="assets/js/main.js?v=4" defer></script>
+  <script type="module" src="assets/js/home.js?v=1"></script>
 </head>
 <body>
   <a class="skip-link" href="#main-content">Skip to main content</a>
   <header class="site-header" data-header>
     <div class="header-inner">
-      <a class="brand" href="#top" aria-label="Fish and Spices home">
+      <a class="brand" href="index.html" aria-label="FishAndSpices.com home">
         <img src="assets/brand/logo-mark.svg" width="46" height="46" alt="">
-        <span class="brand-copy"><strong>Fish <span>&amp;</span> Spices</strong><small>Commercial supply network</small></span>
+        <span class="brand-copy"><strong>FishAndSpices.com</strong><small>Buy &amp; Sell Fish, Spices and Farm Products</small></span>
       </a>
       <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-navigation">
         <span class="sr-only">Open menu</span><span></span><span></span><span></span>
       </button>
       <nav id="site-navigation" class="site-nav" aria-label="Primary navigation">
-        <a href="buy.html">Buy</a><a href="sell.html">Sell</a><a href="how-it-works.html">Managed Matching</a><a href="safety.html">Safety</a><a href="contact.html">Contact</a>
+        <a href="marketplace.html">Browse</a><a href="#categories">Categories</a><a href="marketplace.html?role=buyer">Requirements</a><a href="how-it-works.html">About Us</a>
       </nav>
       <div class="header-actions">
-        <a class="button button-small button-light" href="buy.html">Post Requirement</a>
-        <a class="button button-small button-coral" href="sell.html">List Stock</a>
+        <a class="button button-small homepage-post-requirement" href="buy.html">+ Post Requirement</a>
       </div>
     </div>
   </header>
 
   <main id="main-content">
-    <section class="hero" id="top" aria-labelledby="hero-title">
-      <div class="hero-media hero-media-sea" aria-hidden="true"></div>
-      <div class="hero-media hero-media-spice" aria-hidden="true"></div>
-      <div class="hero-shade" aria-hidden="true"></div>
-      <div class="hero-content">
-        <p class="eyebrow eyebrow-light">Independent commercial sourcing platform</p>
-        <h1 id="hero-title">One trade network for <span>fish</span> and <em>spices.</em></h1>
-        <p class="hero-lead">Submit commercial buying requirements or list available stock for structured lead qualification and potential business matching.</p>
-        <div class="hero-actions" aria-label="Choose your journey">
-          <a class="button button-buy" href="buy.html"><span>I Want to Buy</span><span aria-hidden="true">→</span></a>
-          <a class="button button-sell" href="sell.html"><span>I Want to Sell</span><span aria-hidden="true">→</span></a>
-          <a class="text-link text-link-light" href="#categories">Explore Categories <span aria-hidden="true">↓</span></a>
-        </div>
-      </div>
-      <p class="hero-brand-line">Connecting food supply with commercial demand.</p>
-    </section>
-
-    <section class="journeys section" aria-labelledby="journeys-title">
-      <div class="section-heading split-heading">
-        <div><p class="eyebrow">Two clear routes</p><h2 id="journeys-title">Start from your side of the trade.</h2></div>
-        <p>Buyer requirements and seller availability are qualified separately, keeping commercial intent and next steps clear.</p>
-      </div>
-      <div class="journey-grid">
-        <article class="journey journey-buyer" id="buy">
-          <div class="journey-label"><span>01</span> For commercial buyers</div>
-          <h3>Source against a defined requirement.</h3>
-          <ol>
-            <li><span>1</span><p><strong>Describe the product</strong>Species, grade, form or spice variety.</p></li>
-            <li><span>2</span><p><strong>Add quantity and specification</strong>Include processing, packing and quality needs.</p></li>
-            <li><span>3</span><p><strong>Provide destination and required date</strong>Help potential suppliers assess feasibility.</p></li>
-            <li><span>4</span><p><strong>Submit for qualification and matching</strong>We review commercial purpose before introductions.</p></li>
-          </ol>
-          <div class="submission-actions">
-            <a class="button button-dark" href="buy.html">Post Buying Requirement <span aria-hidden="true">→</span></a>
-            <a class="submission-email" href="buy.html?category=fish">Buy fish or seafood</a>
+    <section class="marketplace-hero" id="top" aria-labelledby="hero-title">
+      <div class="homepage-shell homepage-hero-grid">
+        <div class="homepage-hero-copy">
+          <h1 id="hero-title">Buy &amp; Sell <span>Fish, Spices and Farm Products</span></h1>
+          <p>Connect directly with farmers, sellers, buyers and businesses.</p>
+          <form class="marketplace-search" data-marketplace-search role="search">
+            <label class="sr-only" for="marketplace-search-input">Search the marketplace</label>
+            <input id="marketplace-search-input" name="q" type="search" maxlength="120" placeholder="What are you looking for?" autocomplete="off">
+            <button type="submit" aria-label="Search marketplace">Search</button>
+          </form>
+          <p class="popular-searches"><strong>Popular:</strong> <a href="marketplace.html?q=Fish">Fish</a><a href="marketplace.html?q=Black%20Pepper">Black Pepper</a><a href="marketplace.html?q=Cardamom">Cardamom</a><a href="marketplace.html?q=Ginger">Ginger</a><a href="marketplace.html?q=Turmeric">Turmeric</a><a href="marketplace.html?q=Dry%20Fish">Dry Fish</a></p>
+          <div class="homepage-hero-actions" aria-label="Marketplace actions">
+            <a class="homepage-button homepage-button-primary" href="buy.html" data-home-event="buy_cta_clicked">I Want to Buy</a>
+            <a class="homepage-button homepage-button-secondary" href="sell.html" data-home-event="sell_cta_clicked">I Want to Sell</a>
           </div>
-        </article>
-        <article class="journey journey-seller" id="sell">
-          <div class="journey-label"><span>02</span> For producers and suppliers</div>
-          <h3>Present stock with commercial detail.</h3>
-          <ol>
-            <li><span>1</span><p><strong>Identify available stock</strong>State the species, product, variety or grade.</p></li>
-            <li><span>2</span><p><strong>Add quantity, location and availability</strong>Set a practical supply window.</p></li>
-            <li><span>3</span><p><strong>Provide production and documentation details</strong>Share relevant handling, packing and licence information.</p></li>
-            <li><span>4</span><p><strong>Submit for potential buyer matching</strong>Relevant commercial demand is considered.</p></li>
-          </ol>
-          <div class="submission-actions">
-            <a class="button button-coral" href="sell.html">List Available Stock <span aria-hidden="true">→</span></a>
-            <a class="submission-email" href="sell.html?category=spices">Sell spices</a>
-          </div>
-        </article>
-      </div>
-      <p class="submission-note">Submission begins a review process and does not guarantee a match, sale, supply, price, payment or delivery.</p>
-    </section>
-
-    <section class="categories section" id="categories" aria-labelledby="categories-title">
-      <div class="section-heading category-intro">
-        <div><p class="eyebrow">Commercial sourcing scope</p><h2 id="categories-title">From water and field to trade-ready supply.</h2></div>
-        <p>Categories establish sourcing intent. Product specifications, origin, capacity and documentation are assessed during lead qualification.</p>
-      </div>
-      <div class="category-feature" id="fish">
-        <div class="category-photo category-photo-fish" role="img" aria-label="Commercial aquaculture workers handling fish supply"></div>
-        <div class="category-content">
-          <p class="category-number">01 / Fish &amp; seafood</p>
-          <h3>Species, formats and processing needs.</h3>
-          <ul class="category-list">
-            <li>Varal / snakehead</li><li>Karimeen / pearl spot</li><li>Marine fish</li><li>Freshwater fish</li>
-            <li>Shrimp and prawns</li><li>Crab</li><li>Fresh fish</li><li>Chilled fish</li><li>Frozen seafood</li>
-            <li>Dried fish</li><li>Value-added seafood</li>
-          </ul>
-          <a class="text-link" href="buy.html?category=fish">Submit a fish requirement <span aria-hidden="true">→</span></a>
         </div>
-      </div>
-      <div class="category-feature category-feature-reverse" id="spices">
-        <div class="category-photo category-photo-spices" role="img" aria-label="Assorted whole spices prepared for commercial sorting"></div>
-        <div class="category-content">
-          <p class="category-number">02 / Spices</p>
-          <h3>Whole, processed and specification-led.</h3>
-          <ul class="category-list category-list-amber">
-            <li>Black pepper</li><li>Cardamom</li><li>Turmeric</li><li>Ginger</li><li>Chilli</li><li>Cumin</li>
-            <li>Coriander</li><li>Nutmeg and mace</li><li>Cloves</li><li>Fennel</li><li>Fenugreek</li><li>Spice powders</li>
-          </ul>
-          <a class="text-link" href="sell.html?category=spices">List spice availability <span aria-hidden="true">→</span></a>
+        <div class="hero-product-composition">
+          <img src="assets/images/marketplace-hero-fish-spices.png" width="1704" height="920" fetchpriority="high" alt="Fresh fish, black pepper, cardamom, dried chilli and ginger arranged for the FishAndSpices marketplace">
         </div>
       </div>
     </section>
 
-    <section class="matching section" id="how-it-works" aria-labelledby="matching-title">
-      <div class="matching-head">
-        <p class="eyebrow eyebrow-light">A considered introduction process</p>
-        <h2 id="matching-title">How potential matching works.</h2>
-        <p>Each lead moves through a structured review before any introduction is considered.</p>
-      </div>
-      <ol class="process-list">
-        <li><span class="process-number">01</span><strong>Lead submitted</strong><p>A buyer requirement or seller stock listing begins the process.</p></li>
-        <li><span class="process-number">02</span><strong>Commercial purpose reviewed</strong><p>We look for genuine business intent and a workable request.</p></li>
-        <li><span class="process-number">03</span><strong>Details checked</strong><p>Requirement or stock information is checked for useful specificity.</p></li>
-        <li><span class="process-number">04</span><strong>Potential matches identified</strong><p>Relevant counterparties may be considered based on the submitted details.</p></li>
-        <li><span class="process-number">05</span><strong>Introduction made with consent</strong><p>Contact information is shared only as part of an agreed introduction.</p></li>
-        <li><span class="process-number">06</span><strong>Parties conduct due diligence</strong><p>Participants verify, inspect and negotiate independently.</p></li>
-      </ol>
-      <div class="process-disclaimer"><strong>After an introduction</strong><p>Contracts, payments, product inspection, licences, transport, insurance and logistics are independently agreed by the participating parties.</p></div>
-    </section>
-
-    <section class="market section" id="market-information" aria-labelledby="market-title">
-      <div class="market-visual" aria-hidden="true">
-        <div class="market-grid"></div><span class="data-label data-label-one">FISHERIES</span><span class="data-label data-label-two">SPICES</span><span class="data-label data-label-three">TRADE</span>
-      </div>
-      <div class="market-copy">
-        <p class="eyebrow">Market information / In preparation</p>
-        <h2 id="market-title">Official market-data integration is being prepared.</h2>
-        <p>Future market information may reference public data from MPEDA, Department of Fisheries, NFDB, Spices Board India, AGMARKNET, APEDA and Data.gov.in.</p>
-        <p class="market-note">These references will be informational and will not constitute a Fish &amp; Spices buying or selling price. Fish &amp; Spices is not affiliated with or endorsed by these agencies.</p>
+    <section class="homepage-section homepage-categories" id="categories" aria-labelledby="categories-title">
+      <div class="homepage-shell">
+        <div class="homepage-section-heading"><h2 id="categories-title">Browse Categories</h2><a href="marketplace.html">Browse all</a></div>
+        <div class="category-grid" data-category-grid aria-live="polite"><p class="homepage-loading">Loading marketplace categories...</p></div>
       </div>
     </section>
 
-    <section class="safety section" id="safety" aria-labelledby="safety-title">
-      <div class="safety-heading">
-        <p class="eyebrow">Safety &amp; verification</p><h2 id="safety-title">Commercial trust requires evidence.</h2>
-        <p>Lead qualification can improve the quality of an introduction. It does not replace independent verification.</p>
-      </div>
-      <div class="safety-layout">
-        <div class="verification-list">
-          <h3>Information we may request</h3>
-          <ul><li>Identity or business information</li><li>Registration details</li><li>Relevant licences</li><li>Product photographs</li><li>Farm or facility details</li><li>Laboratory or inspection reports</li><li>Packing and storage information</li></ul>
-        </div>
-        <aside class="due-diligence">
-          <span class="shield-mark" aria-hidden="true">✓</span>
-          <h3>Verify before you commit.</h3>
-          <p>Independently verify counterparties, documents, product samples, contracts, bank accounts and payment terms. Arrange appropriate professional, legal and inspection support for each transaction.</p>
-          <a class="text-link text-link-light" href="safety.html">Read the safety guidance <span aria-hidden="true">→</span></a>
-        </aside>
+    <section class="homepage-section homepage-activity" aria-labelledby="activity-title">
+      <div class="homepage-shell">
+        <div class="homepage-section-heading"><h2 id="activity-title">Latest Requirements &amp; Listings</h2><a href="marketplace.html">View All</a></div>
+        <div class="marketplace-activity-grid" data-marketplace-activity aria-live="polite"><p class="homepage-loading">Loading marketplace activity...</p></div>
       </div>
     </section>
 
-    <section class="about-strip" id="about" aria-labelledby="about-title">
-      <div><p class="eyebrow">About the platform</p><h2 id="about-title">An independent starting point for better-defined trade conversations.</h2></div>
-      <p>Fish &amp; Spices generates and qualifies commercial leads, explores potential buyer–seller matching and facilitates introductions. We do not own farms, vessels, factories, warehouses or inventory.</p>
-    </section>
-
-    <section class="final-cta" id="contact" aria-labelledby="cta-title">
-      <div class="final-cta-inner">
-        <p class="eyebrow eyebrow-light">Contact Fish &amp; Spices</p>
-        <h2 id="cta-title">Buying requirement or available stock—start with the details.</h2>
-        <div class="final-actions"><a class="button button-buy" href="buy.html">Post Buying Requirement <span aria-hidden="true">→</span></a><a class="button button-sell" href="sell.html">List Available Stock <span aria-hidden="true">→</span></a></div>
-        <div class="contact-methods" aria-label="Contact Fish and Spices">
-          <a data-contact-whatsapp target="_blank" rel="noopener noreferrer"><span>WhatsApp</span><strong>+91 87007 32197</strong></a>
-          <a data-contact-email><span>Email</span><strong>AuthenticKeralaSpice@gmail.com</strong></a>
-        </div>
-        <p>Use the structured intake to generate a review summary before sending your lead by WhatsApp or email.</p>
+    <section class="homepage-trust" aria-label="Marketplace trust information">
+      <div class="homepage-shell trust-grid">
+        <article><strong>Review-led profiles</strong><span>Marketplace activity is moderated before publication.</span></article>
+        <article><strong>Qualified introductions</strong><span>Contact is handled through the platform's consent process.</span></article>
+        <article><strong>Privacy-focused handling</strong><span>Commercial details are handled for review and matching.</span></article>
+        <article><strong>Report concerns</strong><span><a href="contact.html">Help keep the marketplace accountable.</a></span></article>
       </div>
     </section>
   </main>
 
-  <footer class="site-footer">
+  <footer class="site-footer homepage-footer">
     <div class="footer-top">
-      <div class="footer-brand"><a class="brand brand-footer" href="#top"><img src="assets/brand/logo-mark.svg" width="48" height="48" alt=""><span class="brand-copy"><strong>Fish <span>&amp;</span> Spices</strong><small>Connecting food supply with commercial demand.</small></span></a><p>An independent lead-generation, sourcing and business-introduction platform for commercial fish, seafood and spice markets.</p></div>
-      <div class="footer-column"><h2>Buyers</h2><a href="buy.html?category=fish">Buy fish</a><a href="buy.html?category=spices">Buy spices</a><a href="how-it-works.html">How matching works</a></div>
-      <div class="footer-column"><h2>Sellers</h2><a href="sell.html?category=fish">Sell fish</a><a href="sell.html?category=spices">Sell spices</a><a href="safety.html">Verification</a></div>
-      <div class="footer-column"><h2>Fish</h2><a href="fish.html">Species and formats</a><a href="buy.html?category=fish">Fish requirements</a></div>
-      <div class="footer-column"><h2>Spices</h2><a href="spices.html">Products and forms</a><a href="buy.html?category=spices">Spice requirements</a></div>
-      <div class="footer-column"><h2>Platform</h2><a href="contact.html">Contact</a><a href="safety.html">Safety</a><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a></div>
+      <div class="footer-brand"><a class="brand brand-footer" href="index.html"><img src="assets/brand/logo-mark.svg" width="48" height="48" alt=""><span class="brand-copy"><strong>FishAndSpices.com</strong><small>Buy &amp; Sell Fish, Spices and Farm Products</small></span></a></div>
+      <div class="footer-column"><h2>Marketplace</h2><a href="marketplace.html">Browse</a><a href="#categories">Categories</a><a href="marketplace.html?role=buyer">Requirements</a></div>
+      <div class="footer-column"><h2>Platform</h2><a href="how-it-works.html">About Us</a><a href="contact.html">Contact Us</a><a href="safety.html">Help Center</a></div>
+      <div class="footer-column"><h2>Legal</h2><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms</a></div>
+      <div class="footer-column"><h2>Contact</h2><a data-contact-whatsapp target="_blank" rel="noopener noreferrer">WhatsApp</a><a data-contact-email>Email</a></div>
     </div>
-    <div class="footer-disclaimer" id="footer-disclaimer"><p>Fish &amp; Spices is an independent lead-generation and sourcing platform. Product availability, credentials, quality, price, inspection, licences, payment, logistics and contractual terms must be independently verified and agreed by the participating parties.</p></div>
     <div class="footer-bottom"><p>© <span data-year>2026</span> Fish &amp; Spices. All rights reserved.</p><p>fishandspices.com</p></div>
   </footer>
 </body>
