@@ -12,8 +12,9 @@ describe('health endpoint', () => {
     expect(JSON.stringify(response.body)).not.toMatch(/url|password|secret/i);
   });
 
-  it('serves the existing homepage through Express', async () => {
+  it('serves the marketplace homepage through Express', async () => {
     const response = await request(createApp({ config, pool: null })).get('/').expect(200);
-    expect(response.text).toContain('Fish <span>&amp;</span> Spices');
+    expect(response.text).toContain('FishAndSpices.com');
+    expect(response.text).toContain('Buy &amp; Sell');
   });
 });
